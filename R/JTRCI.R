@@ -8,11 +8,11 @@ JTRCI <-
            ppid = NA,
            type = "JT",
            plot = T,
+           table = T,
            higherIsBetter = F,
            JT.crit = "auto",
            norm.M = NA,
-           norm.SD = NA,
-           table = T)
+           norm.SD = NA)
     {
   
     

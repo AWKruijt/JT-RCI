@@ -2,7 +2,7 @@
 
 obtain and plot Jacobson and Truax reliable change indices
 
-JTRCI(x.pre = NA, x.post = NA, reliability = NA, ppid = NA, type = "JT", plot = T, higherIsBetter = F, JT.crit = "auto", norm.M = NA, norm.SD = NA
+JTRCI(x.pre = NA, x.post = NA, reliability = NA, ppid = NA, type = "JT", plot = T, table = T, higherIsBetter = F, JT.crit = "auto", norm.M = NA, norm.SD = NA
 
 screenshots:
 
