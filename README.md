@@ -1,5 +1,7 @@
 # JTRCI: Jacobson & Truax reliable change indices
 
+### the reliable change plot displays correctly when 'higherisbetter = T' but the jacobson-truax RCI does not (!) an update is pending ###
+
 obtain and plot Jacobson and Truax reliable change indices
 
 JTRCI(x.pre = NA, x.post = NA, reliability = NA, ppid = NA, type = "JT", plot = T, table = T, higherIsBetter = F, JT.crit = "auto", norm.M = NA, norm.SD = NA
