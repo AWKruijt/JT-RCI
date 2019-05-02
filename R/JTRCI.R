@@ -1,6 +1,11 @@
 # @import data.table
 # @import ggplot2
 
+## this code relies heavily on the excellent article by Stephanie Bauer, Michael Lambert, & Steven Lars Nielsen: 
+## Clinical Significance Methods:A Comparison of Statistical Techniques
+## J Pers Assess. 2004 Feb;82(1):60-70. DOI:10.1207/s15327752jpa8201_11 
+## http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.615.8373&rep=rep1&type=pdf
+
 JTRCI <-
   function(x.pre = NA,
            x.post = NA,
@@ -34,7 +39,7 @@ JTRCI <-
     
     if (length(ppid) != length(x.pre)) {
       ppid <- seq(1:length(x.pre))
-      warning( "\nNo participant IDs provided or length of ppid does not match lenght of data \nsubstituting with values 1:n")
+      warning("\nNo participant IDs provided or length of ppid does not match length of data - substituting with values 1:n")
     }
     
     if (is.na(reliability)) {
@@ -43,11 +48,9 @@ JTRCI <-
     
     # determine SEmeasurement and Sdiff for computation of reliable change index:
     
-    SEmeasurement <-
-      sd(x.pre) * sqrt(1 - reliability) # standard error of measurement based on the sd of the pre measurement/baseline
+    SEmeasurement <- sd(x.pre) * sqrt(1 - reliability) # standard error of measurement based on the sd of the pre measurement/baseline
     
-    Sdiff <-
-      sqrt(2 * SEmeasurement ^ 2) # the SD of the SEm for a difference score
+    Sdiff <-  sqrt(2 * SEmeasurement ^ 2) # the SD of the SEm for a difference score
     
     
     if (type == "JT") {
@@ -60,58 +63,96 @@ JTRCI <-
         # also compute crit A if requested through JT.crit
         
         crittype <- "crit A"
-        crit <- mean(x.pre) - 1.96 * sd(x.pre)  # #The level of functioning at post should fall outside the range of the clinical population (more than 1.96 standard deviation in the 'more healthy' direction).
+
+        # The level of functioning at post should fall outside the range of the baseline population 
+        # i.e. more than 1.96 standard deviation in the 'more healthy' direction - dependent on 'higherIsBetter':
+        if(!higherIsBetter) {
+          crit <- mean(x.pre) - 1.96 * sd(x.pre)  
+        }
         
-        warning("\nJacobson-Truax criterion A computed")
+        if(higherIsBetter) {
+          crit <- mean(x.pre) + 1.96 * sd(x.pre)
+        }
+
+        warning(paste0("\nJacobson-Truax criterion A: ", round(crit, 1)))
+        warning(paste0("\nfor crit A, 'recovered' means: 'post-score falls outside distribtution of the sample at baseline'"))
         
         if (JT.crit == "B" | JT.crit == "C") {
-          # if we're here but a different crit was requested, this means that either one or both of the normdata params is not provided:
-          warning("\nrequested JT.crit requires normdata provided through parameters norm.M and norm.SD \ncomputing JT.crit A instead")
-        }
-      }
-      else {  # if norm data is availabe:
         
-        if( (mean(BIdf$BI.pre) + (3 *sd(BIdf$BI.pre))) %between% c(norm.M - (3 * norm.SD), norm.M + (3 * norm.SD)) |
-          (mean(BIdf$BI.pre) - (3 *sd(BIdf$BI.pre))) %between% c(norm.M - (3 * norm.SD), norm.M + (3 * norm.SD)) ) {
-          # if the pre/clinical sample does not overlap with the norm sample, criterion C is recommended:
-          #The level of functioning at post should place the patient closer to the mean of the comparison norm data than the mean of the clinical norm data / pre measurement - weigted by SD of both clin and norm "
+          # if we're here but a different crit was requested, either one or both of the normdata params is not provided:
+
+          warning(paste0("\nrequested JTcrit (", JT.crit,") requires norm mean and SD"))
+          
+        }
+      } # end of if (is.na(norm.M) | is.na(norm.SD) | JTcrit == "A")
+      
+      else {  # if norm data is availabe:
+
+      if ( all( c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre)) ) < norm.M - (3 * norm.SD) ) | 
+           all( c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre)) ) > norm.M + (3 * norm.SD) ) ) {
+          
+        print("hier nu")
+          # if the pre/clinical sample overlaps with the norm sample, criterion C is recommended:
+          # The level of functioning at post should place the patient closer to the mean of the comparison norm data than the mean of the clinical norm data / pre measurement - weighted by SD of both clin and norm
+
           
           if (JT.crit == "auto" | JT.crit == "C") {
             crittype <- "crit C"
             crit <- ((sd(x.pre) * norm.M) + (norm.SD * mean(x.pre))) / (sd(x.pre) + norm.SD)
-            warning("\nJacobson-Truax criterion C computed")
+            warning(paste0("\nJacobson-Truax criterion C: ", round(crit,1)))
           }
           
           if (JT.crit == "B") {
-            warning("\ncomputing JT.crit B as requested but JT.crit C is recommended based on the data: x.pre does not overlap with the norm distribution")
-            crittype <- "crit B"
-            crit <- norm.M + 1.96 * norm.SD # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data
+            
+            # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data - direction dependent on 'higherisbetter'
+            
+            if(! higherIsBetter){
+              crit <- norm.M + 1.96 * norm.SD 
+            }
+            
+            if(higherIsBetter){
+              crit <- norm.M - 1.96 * norm.SD # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data
+            }
+            
+            warning(paste0("\nJacobson-Truax criterion B: ", round(crit, 1)))
+            warning("\nNB criterion C is recommended when the baseline distribution overlaps with the norm distribution")
           }
-          
-        }
+        } # end of 'if distributions overlap' section
         
         else {
-          # if the distributions of the pre/clinical sample overlaps with the norm distribution, use criterion B: # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data
+          # if the distributions of the pre/clinical sample does not with the norm distribution, use criterion B: # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data
           if (JT.crit == "auto" | JT.crit == "B") {
             crittype <- "crit B"
-            crit <- norm.M + 1.96 * norm.SD # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data
-            warning("\nJacobson-Truax criterion B computed")
+            
+            # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data - direction dependent on 'higherisbetter'
+            
+            if(! higherIsBetter){
+              crit <- norm.M + 1.96 * norm.SD 
+            }
+            
+            if(higherIsBetter){
+              crit <- norm.M - 1.96 * norm.SD 
+            }
+            
+            warning("\nJacobson-Truax criterion B: ", round(crit, 1))
           }
           
           if (JT.crit == "C") {
             warning("\ncomputing JT.crit C as requested but JT.crit B is recommended based on the data: x.pre overlaps with the norm distribution")
             crittype <- "crit C"
-            crit <-
-              ((sd(x.pre) * norm.M) + (norm.SD * mean(x.pre))) / (sd(x.pre) + norm.SD)
-          }
+            crit <- ((sd(x.pre) * norm.M) + (norm.SD * mean(x.pre))) / (sd(x.pre) + norm.SD)
+            
+            
+            warning(paste0("\nJacobson-Truax criterion C: ", round(crit, 1)))
+            }
           
         }
-      }
-    }
+      } # end of 'if norm data is available' section
+    } # end of if (type == "JT") 
       
-      if (type == "RCI") {
-        crittype <- "non JT simple RCI"
-        crit <- "none"
+   if (type == "RCI") {
+       crittype <- "non JT simple RCI"
+       crit <- "none"
       }
       
       # see -> http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.615.8373&rep=rep1&type=pdf
@@ -120,18 +161,11 @@ JTRCI <-
       JTRCIdf <- NULL
       JTRCIdf$ppid <- ppid
       JTRCIdf <- as.data.frame(JTRCIdf)
-  #    x.pre <- as.numeric(x.pre)
-  #    x.post <- as.numeric(x.post)
       JTRCIdf$pre <- x.pre
       JTRCIdf$post <- x.post
 
-      
-      if (higherIsBetter) {
-        JTRCIdf$change <- JTRCIdf$pre - JTRCIdf$post
-      } else {
-        JTRCIdf$change <- JTRCIdf$post - JTRCIdf$pre
-      }
-      
+      JTRCIdf$change <- JTRCIdf$post - JTRCIdf$pre
+
       # write values to JTRCIdf:
       JTRCIdf$SEmeasurement <- SEmeasurement
       JTRCIdf$Sdiff <- Sdiff
@@ -142,16 +176,37 @@ JTRCI <-
       JTRCIdf$RCI <- JTRCIdf$change / Sdiff
       
       if (type == "JT") {
-        # determine Jacobson-Truax classification:
-        JTRCIdf$JTclass_RCI <- NA
-        JTRCIdf$JTclass_RCI [JTRCIdf$post <= crit & JTRCIdf$RCI <= -1.96] <- "recovered"
-        JTRCIdf$JTclass_RCI [JTRCIdf$post <= crit & JTRCIdf$RCI > -1.96]  <- "non reliably recovered"
-        JTRCIdf$JTclass_RCI [JTRCIdf$post > crit & JTRCIdf$RCI <= -1.96]  <- "improved"
-        JTRCIdf$JTclass_RCI [JTRCIdf$post > crit & JTRCIdf$RCI > -1.96]   <- "unchanged"
-        JTRCIdf$JTclass_RCI [JTRCIdf$RCI >= 1.96]                      <- "deteriorated"
+
+        if (!higherIsBetter & sum(x.pre < crit) > 0) { 
+          warning(paste0("\n", sum(x.pre < crit),  " participants scored below the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution!"))}
         
-        JTRCIdf$JTclass_RCI <-
-          factor(JTRCIdf$JTclass_RCI, levels = rev(c("recovered",
+        if (higherIsBetter & sum(x.pre > crit) > 0) { 
+          warning(paste0("\n", sum(x.pre > crit), " participants scored above the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution!"))}
+        
+        
+        if (! higherIsBetter) {
+          # determine Jacobson-Truax classification (note that these next lines only work if the entire series is run in the correct order):
+          JTRCIdf$class_JTRCI <- NA
+          JTRCIdf$class_JTRCI [JTRCIdf$post <= crit & JTRCIdf$RCI <= -1.96] <- "recovered"
+          JTRCIdf$class_JTRCI [JTRCIdf$post <= crit & JTRCIdf$RCI > -1.96]  <- "non reliably recovered"
+          JTRCIdf$class_JTRCI [JTRCIdf$post > crit & JTRCIdf$RCI <= -1.96]  <- "improved"
+          JTRCIdf$class_JTRCI [JTRCIdf$post > crit & JTRCIdf$RCI > -1.96]   <- "unchanged"
+          JTRCIdf$class_JTRCI [JTRCIdf$RCI >= 1.96]                         <- "deteriorated"
+        }
+        
+        if (higherIsBetter) {  
+          # determine Jacobson-Truax classification (note that these next lines only work if the entire series is run in the correct order):
+          JTRCIdf$class_JTRCI <- NA
+          JTRCIdf$class_JTRCI [JTRCIdf$post >= crit & JTRCIdf$RCI >= 1.96] <- "recovered"
+          JTRCIdf$class_JTRCI [JTRCIdf$post >= crit & JTRCIdf$RCI < 1.96]  <- "non reliably recovered"
+          JTRCIdf$class_JTRCI [JTRCIdf$post < crit & JTRCIdf$RCI >= 1.96]  <- "improved"
+          JTRCIdf$class_JTRCI [JTRCIdf$post < crit & JTRCIdf$RCI < 1.96]   <- "unchanged"
+          JTRCIdf$class_JTRCI [JTRCIdf$RCI <= -1.96]                         <- "deteriorated"
+        }
+        
+        
+        JTRCIdf$class_JTRCI <-
+          factor(JTRCIdf$class_JTRCI, levels = rev(c("recovered",
                                                   "non reliably recovered",
                                                   "improved",
                                                   "unchanged",
@@ -160,23 +215,27 @@ JTRCI <-
         JTRCIdf <<- JTRCIdf
         
         if(table) {
-        JTtable <- data.table::setDT(JTRCIdf)[,.N, by = .("Jacobson Truax classification" = JTclass_RCI)]
+        JTtable <- data.table::setDT(JTRCIdf)[,.N, by = .("Jacobson Truax classification" = class_JTRCI)]
         JTtable <- data.table::setorder(JTtable, na.last=T)
         print(JTtable)
          }
-
-        warning( "\nassumed that lower scores are better (and reduction == improvement), if that is incorrect: set higherIsBetter = T")
-      }
+        }
       
       if (type == "RCI") {
-        # determine RCI classification:
-        JTRCIdf$class_RCI <- "no reliable change"
-        JTRCIdf$class_RCI [JTRCIdf$RCI > 1.96] <- "reliably deteriorated"
-        JTRCIdf$class_RCI [JTRCIdf$RCI < -1.96] <- "reliably improved"
+
+      # determine RCI classification:
         
-        JTRCIdf$class_RCI <-factor(JTRCIdf$class_RCI, levels = c("reliably deteriorated",
-                                                           "no reliable change",
-                                                           "reliably improved"))
+        if (higherIsBetter == F) {
+          JTRCIdf$class_RCI <- "no reliable change"
+          JTRCIdf$class_RCI [JTRCIdf$RCI > 1.96] <- "reliably deteriorated"
+          JTRCIdf$class_RCI [JTRCIdf$RCI < -1.96] <- "reliably improved"
+        }
+        
+        if (higherIsBetter == T) {  
+          JTRCIdf$class_RCI <- "no reliable change"
+          JTRCIdf$class_RCI [JTRCIdf$RCI > 1.96] <- "reliably improved"
+          JTRCIdf$class_RCI [JTRCIdf$RCI < -1.96] <- "reliably deteriorated"
+        }
 
         JTRCIdf <<- JTRCIdf
   
@@ -185,16 +244,19 @@ JTRCI <-
           RCItable <- data.table::setorder(RCItable, na.last=T)
           print(RCItable)
         }
-        
-        warning( "\nassumed that lower scores are better (and reduction == improvement), if that is incorrect: set higherIsBetter = T")
+
       }
 
+      if(!higherIsBetter){
+        warning("\nassumed that lower scores are better (and reduction == improvement), if that is incorrect: set higherIsBetter = T")}
+      if(higherIsBetter){
+        warning("\nassumed that higher scores are better (and increased scores == improvement), if that is incorrect: set higherIsBetter = F")}
       
       # previous version also computed Wise table 1 (https://pdfs.semanticscholar.org/5e34/1ae1a311602280bebd31bfe98b5d17ed3ca1.pdf) based classifications but I've cut them out for the moment.
       #
       
       if (plot == T & type == "JT") {
-        JTRCIdf$classPlot <- JTRCIdf$JTclass_RCI
+        JTRCIdf$classPlot <- JTRCIdf$class_JTRCI
         
         for (l in 1:length(levels(JTRCIdf$classPlot))) {
           levels(JTRCIdf$classPlot)[l] <-
@@ -282,9 +344,6 @@ JTRCI <-
         return(JTRCIplot)
         
       }
-      
 
-      
-      
     }
     
