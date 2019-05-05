@@ -1,4 +1,4 @@
-Package: JT-RCI
+Package: JTRCI
 Title: obtain and plot Jacobson and Truax reliable change indices
 Version: 0.01
 Authors@R: person("Anne-Wil", "Kruijt", email = "mail@awkruijt.nl", role = c("aut", "cre"))
