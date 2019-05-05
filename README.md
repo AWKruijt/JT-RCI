@@ -7,14 +7,12 @@ library(JTRCI)
 
 JTRCI(x.pre = NA, x.post = NA, reliability = NA, ppid = NA, indextype = "JT", plot = T, table = T, higherIsBetter = F, JTcrit = "auto", normM = NA, normSD = NA, facetplot = F)
 
-
-
 screenshots:
 
-<img width="460" height="300" src="https://github.com/AWKruijt/JTRCI/blob/master/screenshots/screenshot%20RCI.png">
+<img width="460" height="300" src="https://github.com/AWKruijt/JT-RCI/blob/master/screenshots/example%20one%20group%20JT%20plot.png">
   
-<img width="460" height="300" src="https://github.com/AWKruijt/JTRCI/blob/master/screenshots/screenshot%20plot%20RCI.png">
+<img width="460" height="300" src="https://github.com/AWKruijt/JT-RCI/blob/master/screenshots/example%20JT%20table.png">
 
-<img height="300" src="https://github.com/AWKruijt/JTRCI/blob/master/screenshots/screenshot%20JT.png">
+<img width="460" height="300" src="https://github.com/AWKruijt/JT-RCI/blob/master/screenshots/example%20two%20groups%20JT%20panelplot.png">
   
-<img width="460" height="300" src="https://github.com/AWKruijt/JTRCI/blob/master/screenshots/screenshot%20plot%20JT.png">
+<img width="460" height="300" src="https://github.com/AWKruijt/JT-RCI/blob/master/screenshots/example%20two%20groups%20RCI%20plot.png">
