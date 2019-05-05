@@ -12,7 +12,7 @@
 ## in Journal of Consulting  and Clinical Psycholoy 1991 
 ## https://pdfs.semanticscholar.org/03b7/3ae47ee0058af60de09ea3ef7696fc53eeb1.pdf?_ga=2.145821876.1695931614.1556802049-343840472.1556802049
 
-JT-RCI <- function(x.pre = NA,
+JTRCI <- function(x.pre = NA,
                    x.post = NA,
                    reliability = NA,
                    ppid = NA,
