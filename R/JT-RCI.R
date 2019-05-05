@@ -25,7 +25,7 @@ JTRCI <- function(x.pre = NA,
                    normM = NA,
                    normSD = NA, 
                    facetplot = F) {
-  
+
   ## check inputs:    
   if (!indextype %in% c("JT", "RCI")) {
     stop('\nindextype must be either "JT" or "RCI"', call. = FALSE)}
@@ -306,32 +306,42 @@ JTRCI <- function(x.pre = NA,
     plotrange <- c(c(min(c( JTRCIdf$pre, JTRCIdf$post))) - .1 * datrangelength, c(max(c(JTRCIdf$pre, JTRCIdf$post))) + .1 * datrangelength)
     
     require(ggplot2)
-    
-    if(useGroups & facetplot == F) {groupshapes = T} else {groupshapes = F}
-    if(useGroups & facetplot == T) {groupfacets = T} else {groupfacets = F}
-    
-    JTRCIplot <-
-      ggplot(JTRCIdf[!(is.na(JTRCIdf$post > 0)),], aes(x = pre, y = post, colour = classPlot)) +      
-      {if(groupfacets) facet_wrap(.~ group , if(length(unique(group)) > 3) {2} else{1}) } +
+
+    if(facetplot == F)  {
+      groupshapes = T
+      groupfacets = F}
+    if(facetplot == T)  {
+      groupfacets = T
+      groupshapes = F} 
+    if(!useGroups)      {
+      groupshapes = F 
+      groupfacets = F}
+
+    JTRCIplot <- ggplot(JTRCIdf[!(is.na(JTRCIdf$post > 0)), ], aes(x = pre, y = post, colour = classPlot)) +
+      {if(groupfacets) facet_wrap(.~ group , if(length(unique(JTRCIdf$group)) > 3) {2} else{1}) } +
+      geom_point(size = 2.5) +
+      {if(!groupshapes)geom_point(size = 2.5, shape = 1, colour = "gray30") } +
       {if(groupshapes) aes(shape = group)} +
-      geom_point(size = 2.5, {if(groupshapes) aes(stroke = 1)}) +
+      {if(groupshapes) geom_point(size = 2.5, aes(fill = classPlot))} +
+      {if(groupshapes) geom_point(size = 2.5, colour = "gray30")} +
       geom_abline(intercept = 0, slope = 1) +
       geom_abline(intercept = Sdiff * 1.96, slope = 1, linetype = 3) +
-      geom_abline(intercept = Sdiff * -1.96 , slope = 1,linetype = 3) +
+      geom_abline(intercept = Sdiff * -1.96 , slope = 1, linetype = 3) +
       geom_hline(yintercept = critval, linetype = 2) +
       theme_classic() +
       theme(panel.grid.major = element_line(color = "gray95"), 
-            strip.background = element_blank()) +
+            strip.background = element_blank()) +        
       scale_colour_manual(values = cols) +
-      scale_shape_manual(values=c(0, 1, 6, 5)) +
-      guides(colour = guide_legend(order = 1), shape = guide_legend(order = 2)) + 
-      xlim(plotrange) +
+      scale_fill_manual(values = cols) +
+      scale_shape_manual(values=c(21: 25)) +
+      guides(colour = guide_legend(order = 1), shape = guide_legend(order = 2), fill = F, alpha = F) + 
+      xlim(plotrange) + 
       ylim(plotrange) +
       labs(
-        title = "Jacobson-Truax plot",
+        title = "reliable change plot",
         x = "pre",
         y = "post",
-        colour = "Jacobson-Truax \n classification:"
+        colour = "reliable change \n classification:"
       )
     
     return(JTRCIplot)
@@ -365,25 +375,36 @@ JTRCI <- function(x.pre = NA,
     plotrange <- c(c(min(c( JTRCIdf$pre, JTRCIdf$post ))) - .1 * datrangelength, c(max(c( JTRCIdf$pre, JTRCIdf$post))) + .1 * datrangelength)
     
     require(ggplot2)
-    
-    if(useGroups & facetplot == F) {groupshapes = T} else {groupshapes = F}
-    if(useGroups & facetplot == T) {groupfacets = T} else {groupfacets = F}
+
+    if(facetplot == F)  {
+      groupshapes = T
+      groupfacets = F}
+    if(facetplot == T)  {
+      groupfacets = T
+      groupshapes = F} 
+    if(!useGroups)      {
+      groupshapes = F 
+      groupfacets = F}
     
     JTRCIplot <-
-      ggplot(JTRCIdf[!(is.na(JTRCIdf$post > 0)),], aes(x = pre, y = post, colour = classPlot)) +
-      {if(groupfacets) facet_wrap(.~ group , if(length(unique(group)) > 3) {2} else{1}) } +
+      ggplot(JTRCIdf[!(is.na(JTRCIdf$post > 0)), ], aes(x = pre, y = post, colour = classPlot)) +
+      {if(groupfacets) facet_wrap(.~ group , if(length(unique(JTRCIdf$group)) > 3) {2} else{1}) } +
+      geom_point(size = 2.5) +
+      {if(!groupshapes)geom_point(size = 2.5, shape = 1, colour = "gray30") } +
       {if(groupshapes) aes(shape = group)} +
-      geom_point(size = 2.5, {if(groupshapes) aes(stroke = 1)}) +
+      {if(groupshapes) geom_point(size = 2.5, aes(fill = classPlot))} +
+      {if(groupshapes) geom_point(size = 2.5, colour = "gray30")} +
       geom_abline(intercept = 0, slope = 1) +
       geom_abline(intercept = Sdiff * 1.96, slope = 1, linetype = 3) +
-      geom_abline(intercept = Sdiff * -1.96, slope = 1, linetype = 3) +
+      geom_abline(intercept = Sdiff * -1.96 , slope = 1, linetype = 3) +
       theme_classic() +
       theme(panel.grid.major = element_line(color = "gray95"), 
-            strip.background = element_blank()) +
+            strip.background = element_blank()) +        
       scale_colour_manual(values = cols) +
-      scale_shape_manual(values=c(0, 1, 6, 5)) +
-      guides(colour = guide_legend(order = 1), shape = guide_legend(order = 2)) + 
-      xlim(plotrange) +
+      scale_fill_manual(values = cols) +
+      scale_shape_manual(values=c(21: 25)) +
+      guides(colour = guide_legend(order = 1), shape = guide_legend(order = 2), fill = F, alpha = F) + 
+      xlim(plotrange) + 
       ylim(plotrange) +
       labs(
         title = "reliable change plot",
