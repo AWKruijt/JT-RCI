@@ -184,8 +184,11 @@ JTRCI <- function(x.pre = NA,
   ## check and warn if there are participants who were already 'recovered' at pre - their classification will be odd: 
   if (indextype == "JT") {
     
-    if ( (!higherIsBetter & sum(x.pre < critval) > 0) | (higherIsBetter & sum(x.pre > critval) > 0) ) {
-      warning(paste0( "\n", sum(x.pre < critval),  " participants scored below the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution and consider assessing 'simple' reliable change (by setting indextype = 'RCI')" ) ) }
+    if (!higherIsBetter & (sum(x.pre < critval)) > 0) { 
+      warning(paste0("\n", sum(x.pre < critval),  " participants scored below the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution and consider assesing 'simple' reliable change indices (set parameter indextype = 'RCI')")) }
+
+    if (higherIsBetter & (sum(x.pre > critval)) > 0) { 
+      warning(paste0("\n", sum(x.pre > critval), " participants scored above the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution and consider assesing 'simple' reliable change indices (set parameter indextype = 'RCI')"))} 
     
     if (!higherIsBetter) {
       # determine Jacobson-Truax classification (note that these next lines only 'work' if the entire series is run in the correct order):

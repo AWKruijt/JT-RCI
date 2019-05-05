@@ -2,7 +2,7 @@
 
 obtain and plot Jacobson and Truax reliable change indices
 
-JTRCI(x.pre = NA, x.post = NA, reliability = NA, ppid = NA, indextype = "JT", plot = T, table = T, higherIsBetter = F, JTcrit = "auto", normM = NA, normSD = NA
+JTRCI(x.pre = NA, x.post = NA, reliability = NA, ppid = NA, indextype = "JT", plot = T, table = T, higherIsBetter = F, JTcrit = "auto", normM = NA, normSD = NA, facetplot = F)
 
 screenshots:
 
