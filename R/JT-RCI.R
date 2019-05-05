@@ -21,9 +21,9 @@ JT-RCI <- function(x.pre = NA,
                    plot = T,
                    table = T,
                    higherIsBetter = F,
-                   JT.crit = "auto",
-                   norm.M = NA,
-                   norm.SD = NA, 
+                   JTcrit = "auto",
+                   normM = NA,
+                   normSD = NA, 
                    facetplot = F) {
   
   ## check inputs:    
@@ -72,35 +72,35 @@ JT-RCI <- function(x.pre = NA,
   if (indextype == "JT") {
     # determine the criterion to determine recovery:
     
-    ### the criterion to use is determined by the user or by the following rules if JT.crit == "auto" or norm data is missing: 
+    ### the criterion to use is determined by the user or by the following rules ifJTcrit == "auto" or norm data is missing: 
     # When pre and norm data overlap: C is preferred, if they do not overlap: B is preferred, if no norm-data is available: A has to be used. 
     # also see original Jacobson & Truax (1991) article - https://pdfs.semanticscholar.org/03b7/3ae47ee0058af60de09ea3ef7696fc53eeb1.pdf?_ga=2.145821876.1695931614.1556802049-343840472.1556802049 
     
-    if (is.na(norm.M) | is.na(norm.SD) | JT.crit == "A")  {
+    if (is.na(normM) | is.na(normSD) |JTcrit == "A")  {
       # if no norm data is available, only crit A is  possible, also compute crit A if requested
       
       crittype <- "crit A"
       
       # if we're here but the B or C crit was requested, either one or both of the normdata params is not provided - generate a warning:
-      if (JT.crit == "B" | JT.crit == "C") {
-        warning(paste0( "\ncomputing criterion A - requested JTcrit (", JT.crit, ") requires norm mean and SD"))
+      if (JTcrit == "B" |JTcrit == "C") {
+        warning(paste0( "\ncomputing criterion A - requested JTcrit (",JTcrit, ") requires norm mean and SD"))
       }
       
-    } # end of if (is.na(norm.M) | is.na(norm.SD) | JTcrit == "A")
+    } # end of if (is.na(normM) | is.na(normSD) | JTcrit == "A")
     
     else {
       # if norm data is availabe:
       
       # first check if the norm and pre-distributions overlap: 
-      if (all(c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre))) < norm.M - (3 * norm.SD)) |
-          all(c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre))) > norm.M + (3 * norm.SD))) {
+      if (all(c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre))) < normM - (3 * normSD)) |
+          all(c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre))) > normM + (3 * normSD))) {
         
         # if the pre/clinical sample overlaps with the norm sample, criterion C is recommended:
-        if (JT.crit == "auto" | JT.crit == "C") {
+        if (JTcrit == "auto" |JTcrit == "C") {
           crittype <- "crit C"}
         
         # compute B if explicity requested but add a warning message:
-        if (JT.crit == "B") {
+        if (JTcrit == "B") {
           crittype <- "crit B"
           
           warning("\nNB criterion C is recommended when the baseline distribution overlaps with the norm distribution")
@@ -110,11 +110,11 @@ JT-RCI <- function(x.pre = NA,
       else {
         # if the pre/clinical sample does not overlap with the norm sample, criterion B is preferred (according to Jacobson & Truax on page 15: https://pdfs.semanticscholar.org/03b7/3ae47ee0058af60de09ea3ef7696fc53eeb1.pdf?_ga=2.145821876.1695931614.1556802049-343840472.1556802049)
         
-        if (JT.crit == "auto" | JT.crit == "B") {
+        if (JTcrit == "auto" |JTcrit == "B") {
           crittype <- "crit B"}
         
         # compute C if explicity requested but add a warning message:
-        if (JT.crit == "C") {
+        if (JTcrit == "C") {
           crittype <- "crit C"
           
           warning( "\nNB criterion B is recommended when the baseline distribution does not overlap with the norm distribution")}
@@ -128,37 +128,37 @@ JT-RCI <- function(x.pre = NA,
       # The level of functioning at post should fall outside the range of the baseline population
       # i.e. more than 1.96 standard deviation in the 'more healthy' direction - dependent on 'higherIsBetter':
       if (!higherIsBetter) {
-        crit <- mean(x.pre) - 1.96 * sd(x.pre)}
+        critval <- mean(x.pre) - 1.96 * sd(x.pre)}
       
       if (higherIsBetter) {
-        crit <- mean(x.pre) + 1.96 * sd(x.pre)}
+        critval <- mean(x.pre) + 1.96 * sd(x.pre)}
       
-      warning(paste0("\nJacobson-Truax criterion A: ", round(crit, 1)))
+      warning(paste0("\nJacobson-Truax criterion A: ", round(critval, 1)))
     }
     
     if(crittype == "crit B") {
       # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data - direction dependent on 'higherisbetter'
       if (!higherIsBetter) {
-        crit <- norm.M + 1.96 * norm.SD}
+        critval <- normM + 1.96 * normSD}
       
       if (higherIsBetter) {
-        crit <- norm.M - 1.96 * norm.SD}
+        critval <- normM - 1.96 * normSD}
       
-      warning(paste0("\nJacobson-Truax criterion B: ", round(crit, 1)))
+      warning(paste0("\nJacobson-Truax criterion B: ", round(critval, 1)))
     }
     
     if(crittype == "crit C") {
       # The level of functioning at post should place the patient closer to the mean of the comparison norm data than the mean of the clinical norm data / pre measurement - weighted by SD of both clin and norm
       
-      crit <- ((sd(x.pre) * norm.M) + (norm.SD * mean(x.pre))) / (sd(x.pre) + norm.SD)
+      critval <- ((sd(x.pre) * normM) + (normSD * mean(x.pre))) / (sd(x.pre) + normSD)
       
-      warning(paste0("\nJacobson-Truax criterion C: ", round(crit, 1)))
+      warning(paste0("\nJacobson-Truax criterion C: ", round(critval, 1)))
     }
   } # end of if (indextype == "JT")
   
   if (indextype == "RCI") {
     crittype <- "non JT simple RCI"
-    crit <- "none"
+    critval <- "none"
   }
   
   ## create a JTRCIdf dataframe and log things:
@@ -176,7 +176,7 @@ JT-RCI <- function(x.pre = NA,
   JTRCIdf$SEmeasurement <- SEmeasurement
   JTRCIdf$Sdiff <- Sdiff
   JTRCIdf$crittype <- crittype
-  JTRCIdf$crit <- crit
+  JTRCIdf$critval <- critval
   
   ## compute Reliable Change Indices:
   JTRCIdf$change_Sdiff <- JTRCIdf$change_abs / Sdiff
@@ -184,26 +184,26 @@ JT-RCI <- function(x.pre = NA,
   ## check and warn if there are participants who were already 'recovered' at pre - their classification will be odd: 
   if (indextype == "JT") {
     
-    if ( (!higherIsBetter & sum(x.pre < crit) > 0) | (higherIsBetter & sum(x.pre > crit) > 0) ) {
-      warning(paste0( "\n", sum(x.pre < crit),  " participants scored below the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution and consider assessing 'simple' reliable change (by setting indextype = 'RCI')" ) ) }
+    if ( (!higherIsBetter & sum(x.pre < critval) > 0) | (higherIsBetter & sum(x.pre > critval) > 0) ) {
+      warning(paste0( "\n", sum(x.pre < critval),  " participants scored below the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution and consider assessing 'simple' reliable change (by setting indextype = 'RCI')" ) ) }
     
     if (!higherIsBetter) {
       # determine Jacobson-Truax classification (note that these next lines only 'work' if the entire series is run in the correct order):
       JTRCIdf$class_JTRCI <- NA
-      JTRCIdf$class_JTRCI [JTRCIdf$post <= crit & JTRCIdf$change_Sdiff <= -1.96] <- "recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post <= crit & JTRCIdf$change_Sdiff > -1.96]  <- "non reliably recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post > crit & JTRCIdf$change_Sdiff <= -1.96]  <- "improved"
-      JTRCIdf$class_JTRCI [JTRCIdf$post > crit & JTRCIdf$change_Sdiff > -1.96]   <- "unchanged"
+      JTRCIdf$class_JTRCI [JTRCIdf$post <= critval & JTRCIdf$change_Sdiff <= -1.96] <- "recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post <= critval & JTRCIdf$change_Sdiff > -1.96]  <- "non reliably recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$change_Sdiff <= -1.96]  <- "improved"
+      JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$change_Sdiff > -1.96]   <- "unchanged"
       JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff >= 1.96]                         <- "deteriorated"
     }
     
     if (higherIsBetter) {
       # determine Jacobson-Truax classification (note that these next lines only 'work' if the entire series is run in the correct order):
       JTRCIdf$class_JTRCI <- NA
-      JTRCIdf$class_JTRCI [JTRCIdf$post >= crit & JTRCIdf$change_Sdiff >= 1.96] <- "recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post >= crit & JTRCIdf$change_Sdiff < 1.96]  <- "non reliably recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post < crit & JTRCIdf$change_Sdiff >= 1.96]  <- "improved"
-      JTRCIdf$class_JTRCI [JTRCIdf$post < crit & JTRCIdf$change_Sdiff < 1.96]   <- "unchanged"
+      JTRCIdf$class_JTRCI [JTRCIdf$post >= critval & JTRCIdf$change_Sdiff >= 1.96] <- "recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post >= critval & JTRCIdf$change_Sdiff < 1.96]  <- "non reliably recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$change_Sdiff >= 1.96]  <- "improved"
+      JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$change_Sdiff < 1.96]   <- "unchanged"
       JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff <= -1.96]                       <- "deteriorated"
     }
     
@@ -318,7 +318,7 @@ JT-RCI <- function(x.pre = NA,
       geom_abline(intercept = 0, slope = 1) +
       geom_abline(intercept = Sdiff * 1.96, slope = 1, linetype = 3) +
       geom_abline(intercept = Sdiff * -1.96 , slope = 1,linetype = 3) +
-      geom_hline(yintercept = crit, linetype = 2) +
+      geom_hline(yintercept = critval, linetype = 2) +
       theme_classic() +
       theme(panel.grid.major = element_line(color = "gray95"), 
             strip.background = element_blank()) +
