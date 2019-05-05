@@ -341,10 +341,10 @@ JTRCI <- function(x.pre = NA,
       xlim(plotrange) + 
       ylim(plotrange) +
       labs(
-        title = "reliable change plot",
+        title = "Jacobson-Truax plot",
         x = "pre",
         y = "post",
-        colour = "reliable change \n classification:"
+        colour = "Jacobons-Truax \n classification:"
       )
     
     return(JTRCIplot)
