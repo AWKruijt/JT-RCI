@@ -1,9 +1,9 @@
-Package: JTRCI
+Package: JT-RCI
 Title: obtain and plot Jacobson and Truax reliable change indices
 Version: 0.01
 Authors@R: person("Anne-Wil", "Kruijt", email = "mail@awkruijt.nl", role = c("aut", "cre"))
 Maintainer: Anne-Wil Kruijt <mail@awkruijt.nl>
-Description: Return a datable with an overview of chunks (names and startlines) - to be used at the top of a multi chunk rmd file.
+Description: obtain and plot Jacobson and Truax (JT) and reliable change (RCI) indices 
 License: none
 Encoding: UTF-8
 LazyData: true
