@@ -12,53 +12,58 @@
 ## in Journal of Consulting  and Clinical Psycholoy 1991 
 ## https://pdfs.semanticscholar.org/03b7/3ae47ee0058af60de09ea3ef7696fc53eeb1.pdf?_ga=2.145821876.1695931614.1556802049-343840472.1556802049
 
-JTRCI <- function(x.pre = NA,
-                   x.post = NA,
-                   reliability = NA,
-                   ppid = NA,
-                   group = NA,
-                   indextype = "JT",
-                   plot = T,
-                   table = T,
-                   higherIsBetter = F,
-                   JTcrit = "auto",
-                   normM = NA,
-                   normSD = NA, 
-                   facetplot = F) {
-
+JTRCI <- function(data = NA, 
+                  pre = NA,
+                  post = NA,
+                  ppid = NA,
+                  group = NA,
+                  reliability = NA,
+                  higherIsBetter = F,
+                  indextype = "JT",
+                  JTcrit = "auto",
+                  normM = NA,
+                  normSD = NA, 
+                  dysfM = NA, 
+                  dysfSD = NA, 
+                  plot = T,
+                  table = T, 
+                  ...) {
+  
+  "%inrange%" <- function(x, rng) x >= rng[1] & x <= rng[2]
+  
   ## check inputs:    
   if (!indextype %in% c("JT", "RCI")) {
-    stop('\nindextype must be either "JT" or "RCI"', call. = FALSE)}
+    stop('indextype must be either "JT" or "RCI"\n', call. = FALSE)}
   
-  if (all(is.na(x.pre))) {
-    stop('\nprovide pre data in x.pre', call. = FALSE)}
   
-  if (all(is.na(x.post))) {
-    stop('\nprovide post data in x.post', call. = FALSE)}
+  if (any(rowSums(is.na(data[, c(pre, post)])) != 0)) {
+    message(paste0("NB ", sum(rowSums(is.na(data[, c(pre, post)])))," cases have missing data - these are ommitted from the calculations\n"))
+    
+    df <- data[rowSums(is.na(data[, c(pre, post)])) == 0,]
+  }
   
-  if (length(x.post) != length(x.pre)) {
-    stop("\nx.pre and x.post differ in length")}
-  
-  if (!is.na(ppid) & (length(ppid) != length(x.pre))) {
-    stop("\nlength of ppid does not match length of data")}
+  x.pre <- as.numeric(df [, pre])
+  x.post <- as.numeric(df [, post])
   
   if (is.na(ppid)) {
     ppid <- seq(1:length(x.pre))
-    warning("\nNo participant IDs provided - substituting with values 1:n")}
-  
+    message("No participant IDs provided - substituting with values 1:n\n")} else {
+      ppid <- df [, ppid]}
+
   if (is.na(reliability)) {
-    stop('\nprovide reliability estimate in reliability = ', call. = FALSE)}
+    stop("Provide reliability estimate wih argument 'reliability = '\n", call. = FALSE)}
   
   if (!higherIsBetter) {
-    warning("\nAssumed that lower scores are better (and reduction == improvement), if that is incorrect: set higherIsBetter = T")
+    message("Assumed that lower scores are better (and reduction == improvement),\n if that is incorrect: set higherIsBetter = T\n")
   }
   if (higherIsBetter) {
-    warning("\nAssumed that higher scores are better (and increased scores == improvement), if that is incorrect: set higherIsBetter = F")
+    message("Assumed that higher scores are better (and increased scores == improvement),\n if that is incorrect: set higherIsBetter = F\n")
   }
   
-  if (any(!is.na(group))) {
+  if (!is.na(group)) {
     useGroups = T
   } else{ useGroups = F}
+  
   
   ## determine SEmeasurement and Sdiff for computation of reliable change index:
   
@@ -70,20 +75,36 @@ JTRCI <- function(x.pre = NA,
   ## determine cut-off critera: 
   
   if (indextype == "JT") {
+    
     # determine the criterion to determine recovery:
     
     ### the criterion to use is determined by the user or by the following rules ifJTcrit == "auto" or norm data is missing: 
     # When pre and norm data overlap: C is preferred, if they do not overlap: B is preferred, if no norm-data is available: A has to be used. 
     # also see original Jacobson & Truax (1991) article - https://pdfs.semanticscholar.org/03b7/3ae47ee0058af60de09ea3ef7696fc53eeb1.pdf?_ga=2.145821876.1695931614.1556802049-343840472.1556802049 
     
-    if (is.na(normM) | is.na(normSD) |JTcrit == "A")  {
-      # if no norm data is available, only crit A is  possible, also compute crit A if requested
+    # if either or both mean and SD for the dysfunctional is missing - the baseline distribution can be used instead:
+    if (any(is.na(c(dysfM, dysfSD)))) {
+      usingBLasDysf <- T
       
-      crittype <- "crit A"
+      dysfMtoUse <- mean(x.pre)
+      dysfSDtoUse <- sd(x.pre)
       
-      # if we're here but the B or C crit was requested, either one or both of the normdata params is not provided - generate a warning:
+      message("NB: using the sample baseline distribution to characterize the dysfunctional population. \n    to change: provide norms for dysfunctional population using 'dysfM =' and 'dysfSD ='\n") }
+    
+    else { 
+      usingBLasDysf <- F 
+      dysfMtoUse <- dysfM
+      dysfSDtoUse <- dysfSD }
+    
+    if (is.na(normM) | is.na(normSD) | JTcrit == "A")  {
+      # if no healthy sample norm data is available, only criterion A is  possible, also compute criterion A if requested. 
+      # For its computation either the dysfunctional population norm M and SD will be used (if provided) or alternatively the mean and SD of the sample at baseline - see above. 
+      
+      crittype <- "criterion A"
+      
+      # if we're here but the B or C crit was requested, either one or both of the healthy normdata params is not provided - generate a warning:
       if (JTcrit == "B" |JTcrit == "C") {
-        warning(paste0( "\ncomputing criterion A - requested JTcrit (",JTcrit, ") requires norm mean and SD"))
+        warning(paste0( "NB: computing criterion A - the requested JTcrit (",JTcrit, ") requires healthy norm mean and SD to be provided through arguments 'normM =' and 'normSD ='\n"))
       }
       
     } # end of if (is.na(normM) | is.na(normSD) | JTcrit == "A")
@@ -91,19 +112,19 @@ JTRCI <- function(x.pre = NA,
     else {
       # if norm data is availabe:
       
-      # first check if the norm and pre-distributions overlap: 
-      if (all(c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre))) < normM - (3 * normSD)) |
-          all(c(mean(x.pre) - (3 * sd(x.pre)), mean(x.pre) + (3 * sd(x.pre))) > normM + (3 * normSD))) {
+      # first check if the norm and dysfucnctional/pre-distributions overlap: 
+      if ( (dysfMtoUse + (3 * dysfSDtoUse)) %inrange% c(normM - (3 * normSD), normM + (3 * normSD)) |
+           (dysfMtoUse - (3 * dysfSDtoUse)) %inrange% c(normM - (3 * normSD), normM + (3 * normSD)) ) {
         
-        # if the pre/clinical sample overlaps with the norm sample, criterion C is recommended:
+        # if the pre/dysfunctional distribution overlaps with the norm distribution, criterion C is recommended:
         if (JTcrit == "auto" |JTcrit == "C") {
-          crittype <- "crit C"}
+          crittype <- "criterion C"}
         
-        # compute B if explicity requested but add a warning message:
+        # compute B if explicity requested by the user but add a message:
         if (JTcrit == "B") {
-          crittype <- "crit B"
+          crittype <- "criterion B"
           
-          warning("\nNB criterion C is recommended when the baseline distribution overlaps with the norm distribution")
+          message("NB criterion C is recommended when the baseline distribution overlaps with the norm distribution\n")
         }
       } # end of 'if distributions overlap' section
       
@@ -111,48 +132,62 @@ JTRCI <- function(x.pre = NA,
         # if the pre/clinical sample does not overlap with the norm sample, criterion B is preferred (according to Jacobson & Truax on page 15: https://pdfs.semanticscholar.org/03b7/3ae47ee0058af60de09ea3ef7696fc53eeb1.pdf?_ga=2.145821876.1695931614.1556802049-343840472.1556802049)
         
         if (JTcrit == "auto" |JTcrit == "B") {
-          crittype <- "crit B"}
+          crittype <- "criterion B"}
         
-        # compute C if explicity requested but add a warning message:
+        # compute C if explicity requested but add a message:
         if (JTcrit == "C") {
-          crittype <- "crit C"
+          crittype <- "criterion C"
           
-          warning( "\nNB criterion B is recommended when the baseline distribution does not overlap with the norm distribution")}
+          message("NB criterion B is recommended when the",  
+                  switch(as.character(usingBLasDysf), "TRUE" = paste("baseline sample", 
+                                                      "FALSE" = "dysfunctional population"), 
+                         "distribution does not overlap with the norm distribution\n") )  }
       } # end of if no overlap section
     } # end of 'if norm data is available' section
     
     
     ## compute the determined crit type: 
     
-    if(crittype == "crit A") {
-      # The level of functioning at post should fall outside the range of the baseline population
-      # i.e. more than 1.96 standard deviation in the 'more healthy' direction - dependent on 'higherIsBetter':
+    if(crittype == "criterion A") {
+      # The level of functioning at post should fall outside the range of the dysfunctional population OR the baseline population 
+      # i.e. more than 2 standard deviation in the 'more healthy' direction - dependent on 'higherIsBetter':
+      
       if (!higherIsBetter) {
-        critval <- mean(x.pre) - 1.96 * sd(x.pre)}
-      
+        critval <- dysfMtoUse - 2 * dysfSDtoUse
+      }
       if (higherIsBetter) {
-        critval <- mean(x.pre) + 1.96 * sd(x.pre)}
+        critval <- dysfMtoUse + 2 * dysfSDtoUse
+      } 
       
-      warning(paste0("\nJacobson-Truax criterion A: ", round(critval, 1)))
+      message("Jacobson-Truax criterion A: ", round(critval, 1))
+      message(" this value represents two sd from the ", 
+                    switch(as.character(usingBLasDysf), 
+                           "TRUE" = paste("baseline", if(useGroups) {"total"}, "sample mean\n"), "FALSE" = "dysfunctional population mean\n"))
+      
     }
     
-    if(crittype == "crit B") {
-      # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 1.96 standard deviation of the mean of the comparison norm data - direction dependent on 'higherisbetter'
+    if(crittype == "criterion B") {
+      # The level of functioning at post should fall within the range of the comparison non-clinical group,i.e. within 2 standard deviation of the mean of the comparison norm data - direction dependent on 'higherisbetter'
       if (!higherIsBetter) {
-        critval <- normM + 1.96 * normSD}
+        critval <- normM + 2 * normSD}
       
       if (higherIsBetter) {
-        critval <- normM - 1.96 * normSD}
+        critval <- normM - 2 * normSD}
       
-      warning(paste0("\nJacobson-Truax criterion B: ", round(critval, 1)))
+      message("Jacobson-Truax criterion B: ", round(critval, 1))
+      message(" this value represents two sd from the functional/healthy population norm mean\n")
     }
     
-    if(crittype == "crit C") {
+    if(crittype == "criterion C") {
       # The level of functioning at post should place the patient closer to the mean of the comparison norm data than the mean of the clinical norm data / pre measurement - weighted by SD of both clin and norm
       
       critval <- ((sd(x.pre) * normM) + (normSD * mean(x.pre))) / (sd(x.pre) + normSD)
       
-      warning(paste0("\nJacobson-Truax criterion C: ", round(critval, 1)))
+      message("Jacobson-Truax criterion C:", round(critval, 1))
+      message(" this value represents the weighted midpoint between the ", 
+                     switch(as.character(usingBLasDysf), 
+                            "TRUE" = paste("baseline", if(useGroups) {"total"}, "sample mean"), "FALSE" = "dysfunctional"), 
+                     " and functional norm mean, \n i.e. the value at which an individual is equally likely to belong to the functional as to the dysfunctional population\n")
     }
   } # end of if (indextype == "JT")
   
@@ -166,7 +201,7 @@ JTRCI <- function(x.pre = NA,
   JTRCIdf <- NULL
   JTRCIdf$ppid <- ppid
   JTRCIdf <- as.data.frame(JTRCIdf)
-  if(useGroups) {JTRCIdf$group <- as.factor(group)}
+  if(useGroups) {JTRCIdf$group <- as.factor(df[, group])}
   JTRCIdf$pre <- x.pre
   JTRCIdf$post <- x.post
   
@@ -185,10 +220,10 @@ JTRCI <- function(x.pre = NA,
   if (indextype == "JT") {
     
     if (!higherIsBetter & (sum(x.pre < critval)) > 0) { 
-      warning(paste0("\n", sum(x.pre < critval),  " participants scored below the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution and consider assesing 'simple' reliable change indices (set parameter indextype = 'RCI')")) }
-
+      message(sum(x.pre < critval),  " participants scored below the Jacobson-Truax cut-off score at the pre-measurement \n interpret their Jacobson-Truax classification with caution") }
+    
     if (higherIsBetter & (sum(x.pre > critval)) > 0) { 
-      warning(paste0("\n", sum(x.pre > critval), " participants scored above the Jacobson-Truax cut-off score at the pre-measurement - interpret Jacobson-Truax classification with caution and consider assesing 'simple' reliable change indices (set parameter indextype = 'RCI')"))} 
+      message(sum(x.pre > critval), " participants scored above the Jacobson-Truax cut-off score at the pre-measurement \n interpret their Jacobson-Truax classification with caution")} 
     
     if (!higherIsBetter) {
       # determine Jacobson-Truax classification (note that these next lines only 'work' if the entire series is run in the correct order):
@@ -197,7 +232,7 @@ JTRCI <- function(x.pre = NA,
       JTRCIdf$class_JTRCI [JTRCIdf$post <= critval & JTRCIdf$change_Sdiff > -1.96]  <- "non reliably recovered"
       JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$change_Sdiff <= -1.96]  <- "improved"
       JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$change_Sdiff > -1.96]   <- "unchanged"
-      JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff >= 1.96]                         <- "deteriorated"
+      JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff >= 1.96]                            <- "deteriorated"
     }
     
     if (higherIsBetter) {
@@ -207,7 +242,7 @@ JTRCI <- function(x.pre = NA,
       JTRCIdf$class_JTRCI [JTRCIdf$post >= critval & JTRCIdf$change_Sdiff < 1.96]  <- "non reliably recovered"
       JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$change_Sdiff >= 1.96]  <- "improved"
       JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$change_Sdiff < 1.96]   <- "unchanged"
-      JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff <= -1.96]                       <- "deteriorated"
+      JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff <= -1.96]                          <- "deteriorated"
     }
     
     
@@ -261,8 +296,6 @@ JTRCI <- function(x.pre = NA,
       if(useGroups) {
         
         RCItable <- htmlTable::htmlTable(table(JTRCIdf$class_RCI, JTRCIdf$group))
-        
-        #RCItable <- kable(table(JTRCIdf$class_RCI, JTRCIdf$group))
         print(RCItable)
       }
       else {
@@ -277,147 +310,11 @@ JTRCI <- function(x.pre = NA,
   ## plot JTRCI or RCI if requested:
   
   if (plot == T & indextype == "JT") {
-    
-    # add a variable classplot to the dataframe and add to each level the number of cases for each level:
-    JTRCIdf$classPlot <- JTRCIdf$class_JTRCI
-    
-    for (l in 1:length(levels(JTRCIdf$classPlot))) {
-      levels(JTRCIdf$classPlot)[l] <-  paste0(levels(JTRCIdf$classPlot)[l],": ", table(JTRCIdf$classPlot)[[l]])
-    }
-    
-    
-    # created vector of plot colours linked to specific level names:
-    cols <- c(
-      "recovered" = "orchid3",
-      "non reliably recovered" = "palevioletred3",
-      "improved" = "olivedrab3",
-      "unchanged" = "skyblue3",
-      "deteriorated" = "coral1"
-    )
-    
-    # and substitute its level names with the level names with added case counts
-    names(cols) <- c(
-      levels(JTRCIdf$classPlot)[grep("^recovered", levels(JTRCIdf$classPlot))],
-      levels(JTRCIdf$classPlot)[grep("non reliably", levels(JTRCIdf$classPlot))],
-      levels(JTRCIdf$classPlot)[grep("improved", levels(JTRCIdf$classPlot))],
-      levels(JTRCIdf$classPlot)[grep("unchanged", levels(JTRCIdf$classPlot))],
-      levels(JTRCIdf$classPlot)[grep("deteriorated",  levels(JTRCIdf$classPlot))]
-    )
-    
-    # determine the datarange in order to adjust the axis range:
-    datrangelength <- c(max(c(JTRCIdf$pre, JTRCIdf$post))) - c(min(c(JTRCIdf$pre, JTRCIdf$post)))
-    plotrange <- c(c(min(c( JTRCIdf$pre, JTRCIdf$post))) - .1 * datrangelength, c(max(c(JTRCIdf$pre, JTRCIdf$post))) + .1 * datrangelength)
-    
-    require(ggplot2)
-
-    if(facetplot == F)  {
-      groupshapes = T
-      groupfacets = F}
-    if(facetplot == T)  {
-      groupfacets = T
-      groupshapes = F} 
-    if(!useGroups)      {
-      groupshapes = F 
-      groupfacets = F}
-
-    JTRCIplot <- ggplot(JTRCIdf[!(is.na(JTRCIdf$post > 0)), ], aes(x = pre, y = post, colour = classPlot)) +
-      {if(groupfacets) facet_wrap(.~ group , if(length(unique(JTRCIdf$group)) > 3) {2} else{1}) } +
-      geom_point(size = 2.5) +
-      {if(!groupshapes)geom_point(size = 2.5, shape = 1, colour = "gray30") } +
-      {if(groupshapes) aes(shape = group)} +
-      {if(groupshapes) geom_point(size = 2.5, aes(fill = classPlot))} +
-      {if(groupshapes) geom_point(size = 2.5, colour = "gray30")} +
-      geom_abline(intercept = 0, slope = 1) +
-      geom_abline(intercept = Sdiff * 1.96, slope = 1, linetype = 3) +
-      geom_abline(intercept = Sdiff * -1.96 , slope = 1, linetype = 3) +
-      geom_hline(yintercept = critval, linetype = 2) +
-      theme_classic() +
-      theme(panel.grid.major = element_line(color = "gray95"), 
-            strip.background = element_blank()) +        
-      scale_colour_manual(values = cols) +
-      scale_fill_manual(values = cols) +
-      scale_shape_manual(values=c(21: 25)) +
-      guides(colour = guide_legend(order = 1), shape = guide_legend(order = 2), fill = F, alpha = F) + 
-      xlim(plotrange) + 
-      ylim(plotrange) +
-      labs(
-        title = "Jacobson-Truax plot",
-        x = "pre",
-        y = "post",
-        colour = "Jacobons-Truax \n classification:"
-      )
-    
-    return(JTRCIplot)
+    plot_JT(...)
   }
   
   if (plot == T & indextype == "RCI") {
-    
-    # add a variable classplot to the dataframe and add to each level the number of cases for each level:
-    JTRCIdf$classPlot <- as.factor(JTRCIdf$class_RCI)
-    
-    for (l in 1:length(levels(JTRCIdf$classPlot))) {
-      levels(JTRCIdf$classPlot)[l] <-  paste0(levels(JTRCIdf$classPlot)[l], ": ", table(JTRCIdf$classPlot)[[l]])
-    }
-    
-    # created vector of plot colours linked to specific level names:
-    cols <- c(
-      "reliably deteriorated" = "coral1",
-      "no reliable change" = "skyblue3",
-      "reliably improved" = "orchid3"
-    )
-    
-    # and substitute its level names with the level names with added case counts
-    names(cols) <- c(
-      levels(JTRCIdf$classPlot)[grep("reliably deteriorated", levels(JTRCIdf$classPlot))],
-      levels(JTRCIdf$classPlot)[grep("no reliable change", levels(JTRCIdf$classPlot))],
-      levels(JTRCIdf$classPlot)[grep("reliably improved", levels(JTRCIdf$classPlot))]
-    )
-    
-    # determine the datarange in order to adjust the axis range:
-    datrangelength <- c(max(c(JTRCIdf$pre, JTRCIdf$post))) - c(min(c(JTRCIdf$pre, JTRCIdf$post)))
-    plotrange <- c(c(min(c( JTRCIdf$pre, JTRCIdf$post ))) - .1 * datrangelength, c(max(c( JTRCIdf$pre, JTRCIdf$post))) + .1 * datrangelength)
-    
-    require(ggplot2)
-
-    if(facetplot == F)  {
-      groupshapes = T
-      groupfacets = F}
-    if(facetplot == T)  {
-      groupfacets = T
-      groupshapes = F} 
-    if(!useGroups)      {
-      groupshapes = F 
-      groupfacets = F}
-    
-    JTRCIplot <-
-      ggplot(JTRCIdf[!(is.na(JTRCIdf$post > 0)), ], aes(x = pre, y = post, colour = classPlot)) +
-      {if(groupfacets) facet_wrap(.~ group , if(length(unique(JTRCIdf$group)) > 3) {2} else{1}) } +
-      geom_point(size = 2.5) +
-      {if(!groupshapes)geom_point(size = 2.5, shape = 1, colour = "gray30") } +
-      {if(groupshapes) aes(shape = group)} +
-      {if(groupshapes) geom_point(size = 2.5, aes(fill = classPlot))} +
-      {if(groupshapes) geom_point(size = 2.5, colour = "gray30")} +
-      geom_abline(intercept = 0, slope = 1) +
-      geom_abline(intercept = Sdiff * 1.96, slope = 1, linetype = 3) +
-      geom_abline(intercept = Sdiff * -1.96 , slope = 1, linetype = 3) +
-      theme_classic() +
-      theme(panel.grid.major = element_line(color = "gray95"), 
-            strip.background = element_blank()) +        
-      scale_colour_manual(values = cols) +
-      scale_fill_manual(values = cols) +
-      scale_shape_manual(values=c(21: 25)) +
-      guides(colour = guide_legend(order = 1), shape = guide_legend(order = 2), fill = F, alpha = F) + 
-      xlim(plotrange) + 
-      ylim(plotrange) +
-      labs(
-        title = "reliable change plot",
-        x = "pre",
-        y = "post",
-        colour = "reliable change \n classification:"
-      )
-    
-    return(JTRCIplot)
-    
-  }
+    plot_RCI(...)
+  } 
   
 }
