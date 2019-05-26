@@ -101,7 +101,7 @@ JTRCI(data = df,
     ## NB: using the sample baseline distribution to characterize the dysfunctional population. 
     ##     to change: provide norms for dysfunctional population using 'dysfM =' and 'dysfSD ='
 
-    ## Jacobson-Truax criterion A: 47.2
+    ## Jacobson-Truax criterion A: 50.6
 
     ##  this value represents two sd from the baseline total sample mean
 
@@ -109,10 +109,10 @@ JTRCI(data = df,
     ##  interpret their Jacobson-Truax classification with caution
 
     ##    Jacobson Truax classification  N
-    ## 1:                     unchanged 10
-    ## 2:                      improved 12
-    ## 3:        non reliably recovered  4
-    ## 4:                     recovered 38
+    ## 1:                     unchanged  7
+    ## 2:                      improved 14
+    ## 3:        non reliably recovered  3
+    ## 4:                     recovered 40
 
 <img src="README_files/figure-gfm/unnamed-chunk-8-1.png" height="450px" />
 
@@ -164,10 +164,10 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
     ##  this value represents two sd from the functional/healthy population norm mean
 
     ##    Jacobson Truax classification  N
-    ## 1:                     unchanged 11
-    ## 2:                      improved 17
-    ## 3:        non reliably recovered  3
-    ## 4:                     recovered 33
+    ## 1:                     unchanged  9
+    ## 2:                      improved 24
+    ## 3:        non reliably recovered  1
+    ## 4:                     recovered 30
 
 <img src="README_files/figure-gfm/unnamed-chunk-11-1.png" height="450px" />
 
@@ -184,7 +184,7 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
     ## Assumed that lower scores are better (and reduction == improvement),
     ##  if that is incorrect: set higherIsBetter = T
 
-    ## Jacobson-Truax criterion C:45.8
+    ## Jacobson-Truax criterion C:47.1
 
     ##  this value represents the weighted midpoint between the dysfunctional and functional norm mean, 
     ##  i.e. the value at which an individual is equally likely to belong to the functional as to the dysfunctional population
@@ -193,9 +193,9 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
     ##  interpret their Jacobson-Truax classification with caution
 
     ##    Jacobson Truax classification  N
-    ## 1:                     unchanged 11
-    ## 2:                      improved 14
+    ## 1:                     unchanged  7
+    ## 2:                      improved 19
     ## 3:        non reliably recovered  3
-    ## 4:                     recovered 36
+    ## 4:                     recovered 35
 
 <img src="README_files/figure-gfm/unnamed-chunk-12-1.png" height="450px" />
