@@ -69,8 +69,8 @@ The JTplot()/RCIplot() functions take the following parameters:
 plot”,  
              addInfoLegend = c(“yes”, “classcounts”, “JTcrit”, “no”))
 
-These parameters can also be passed directly into a call on JTRCI() (see
-examples below)
+The plot parameters can also be passed directly into a call on JTRCI()
+(see examples below)
 
 # 
 
@@ -108,7 +108,6 @@ JTRCI(data = df,
       ppid = "ppid", 
       pre = "pre", 
       post = "post",  
-      group = "group", 
       reliability = .8, 
       indextype = "JT", 
       JTcrit = "auto")
@@ -120,18 +119,19 @@ JTRCI(data = df,
     ## NB: using the sample baseline distribution to characterize the dysfunctional population. 
     ##     to change: provide norms for dysfunctional population using 'dysfM =' and 'dysfSD ='
 
-    ## Jacobson-Truax criterion A: 51.5
+    ## Jacobson-Truax criterion A: 51.6
 
-    ##  this value represents two sd from the baseline total sample mean
+    ##  this value represents two sd from the baseline  sample mean
 
-    ## 1 participants scored below the Jacobson-Truax cut-off score at the pre-measurement 
+    ## 2 participants scored below the Jacobson-Truax cut-off score at the pre-measurement 
     ##  interpret their Jacobson-Truax classification with caution
 
-    ##    Jacobson Truax classification  N
-    ## 1:                     unchanged  8
-    ## 2:                      improved  5
-    ## 3:        non reliably recovered  3
-    ## 4:                     recovered 48
+    ##    Jacobson-Truax classification  N
+    ## 1:                  deteriorated  0
+    ## 2:                     unchanged  3
+    ## 3:                      improved  2
+    ## 4:        non reliably recovered  2
+    ## 5:                     recovered 57
 
 <img src="README_files/figure-gfm/unnamed-chunk-8-1.png" height="450px" />
 
@@ -139,7 +139,7 @@ Obtain reliable change indices by setting parameter indextype = “RCI”:
 
 ``` r
 # obtain reliable change indices 
-# also disable plotting with plot = F:
+# disable table and plot with 'table = F' & 'plot = F'
 JTRCI(data = df, pre = "pre", post = "post", group = "group", ppid = "ppid",
       reliability = .8, indextype = "RCI",  table = F, plot = F)
 ```
@@ -153,10 +153,30 @@ plot\_RCI():
 ``` r
 # plot the reliable change indices obtained in the previous chunk - set x y and plot labels:
 
-plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change plot")
+plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change plot", useGroups = F)
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-10-1.png" height="450px" />
+
+and obtain RCI tables by calling tableRCI():
+
+``` r
+tableRCI(useGroups = F)
+```
+
+    ##    reliable change classification  N
+    ## 1:          reliably deteriorated  0
+    ## 2:             no reliable change  5
+    ## 3:              reliably improved 59
+
+``` r
+tableRCI(useGroups = T)
+```
+
+    ##    reliable change classification control treatment
+    ## 1:          reliably deteriorated       0         0
+    ## 2:             no reliable change       3         2
+    ## 3:              reliably improved      29        30
 
 Parameters for the plot\_JT()/plot\_RCI() functions can also be passed
 directly in the JTRCI() function:
@@ -186,12 +206,14 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
 
     ##  this value represents two sd from the functional/healthy population norm mean
 
-    ##    Jacobson Truax classification  N
-    ## 1:                     unchanged 11
-    ## 2:                      improved 27
-    ## 3:                     recovered 26
+    ##    Jacobson-Truax classification control treatment
+    ## 1:                  deteriorated       0         0
+    ## 2:                     unchanged       3         2
+    ## 3:                      improved      18        15
+    ## 4:        non reliably recovered       0         0
+    ## 5:                     recovered      11        15
 
-<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" height="450px" />
+<img src="README_files/figure-gfm/unnamed-chunk-12-1.png" height="450px" />
 
 Plot groups in separate facets:
 
@@ -215,13 +237,14 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
     ##  this value represents the weighted midpoint between the dysfunctional and functional norm mean, 
     ##  i.e. the value at which an individual is equally likely to belong to the functional as to the dysfunctional population
 
-    ##    Jacobson Truax classification  N
-    ## 1:                     unchanged 10
-    ## 2:                      improved 17
-    ## 3:        non reliably recovered  1
-    ## 4:                     recovered 36
+    ##    Jacobson-Truax classification control treatment
+    ## 1:                  deteriorated       0         0
+    ## 2:                     unchanged       3         1
+    ## 3:                      improved      12         7
+    ## 4:        non reliably recovered       0         1
+    ## 5:                     recovered      17        23
 
-<img src="README_files/figure-gfm/unnamed-chunk-12-1.png" height="450px" />
+<img src="README_files/figure-gfm/unnamed-chunk-13-1.png" height="450px" />
 
 It is important to note that when assessing/plotting Jacobson-Truax
 indices for multiple groups, the function treats the groups as one group
@@ -242,7 +265,7 @@ post-assessment would be classified as ‘recovered’ without an actual
 recovering happening. The JTRCI() function will issue a message if any
 participant scored below the JT criterion at baseline.
 
-If such cases occur and are problmeatic, the more ‘simple’ reliable
+If such cases occur and are problematic, the more ‘simple’ reliable
 change indices can be used (set parameter ‘indextype = “RCI”’). Reliable
 change indices can also be used for comparison of groups preselected to
 (likely) differ at baseline on the measure assessed.

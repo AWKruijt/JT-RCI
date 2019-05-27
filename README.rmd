@@ -12,10 +12,13 @@ knitr::opts_chunk$set(dpi=300, out.height ="450px", fig.asp = .71, fig.pos = "h"
 
 ```{r warning=FALSE, include=FALSE}
 require(ggplot2)
+require(data.table)
 
 source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/JT-RCI.R')
 source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/plotJT.R')
 source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/plotRCI.R')
+source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/tableJT.R')
+source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/tableRCI.R')
 ```
 
 ```{r include=FALSE}
@@ -77,7 +80,7 @@ The JTplot()/RCIplot() functions take the following parameters:
 |              xlab = "pre", ylab = "post", plottitle = "Jacobson-Truax plot", 
 |              addInfoLegend = c("yes", "classcounts", "JTcrit", "no"))
 
-These parameters can also be passed directly into a call on JTRCI() (see examples below)
+The plot parameters can also be passed directly into a call on JTRCI() (see examples below)
 
 #
 
@@ -108,7 +111,6 @@ JTRCI(data = df,
       ppid = "ppid", 
       pre = "pre", 
       post = "post",  
-      group = "group", 
       reliability = .8, 
       indextype = "JT", 
       JTcrit = "auto")
@@ -117,7 +119,7 @@ JTRCI(data = df,
 Obtain reliable change indices by setting parameter indextype = "RCI":
 ```{r}
 # obtain reliable change indices 
-# also disable plotting with plot = F:
+# disable table and plot with 'table = F' & 'plot = F'
 JTRCI(data = df, pre = "pre", post = "post", group = "group", ppid = "ppid",
       reliability = .8, indextype = "RCI",  table = F, plot = F)
 ```
@@ -126,7 +128,14 @@ Subsequently plot the RCI with a separate call to plot_RCI():
 ```{r}
 # plot the reliable change indices obtained in the previous chunk - set x y and plot labels:
 
-plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change plot")
+plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change plot", useGroups = F)
+```
+
+and obtain RCI tables by calling tableRCI():
+```{r}
+tableRCI(useGroups = F)
+
+tableRCI(useGroups = T)
 ```
 
 Parameters for the plot_JT()/plot_RCI() functions can also be passed directly in the JTRCI() function:
@@ -160,6 +169,6 @@ It is important to note that when assessing/plotting Jacobson-Truax indices for 
 
 Generally speaking (regardless of number of groups), Jacobson-Truax indices are designed for use with participants selected so that they would be expected to score high (or low in case of a higher-is-better measure) on the measure assessed. For a control group in which most/all participants score already within the 'functional' (norm) range the traditional Jacobson-Truax classification labels make little sense: i.e. someone who scored in the healthy range at both the pre- and the post-assessment would be classified as 'recovered' without an actual recovering happening. The JTRCI() function will issue a message if any participant scored below the JT criterion at baseline. 
 
-If such cases occur and are problmeatic, the more 'simple' reliable change indices can be used (set parameter 'indextype = "RCI"'). Reliable change indices can also be used for comparison of groups preselected to (likely) differ at baseline on the measure assessed. 
+If such cases occur and are problematic, the more 'simple' reliable change indices can be used (set parameter 'indextype = "RCI"'). Reliable change indices can also be used for comparison of groups preselected to (likely) differ at baseline on the measure assessed. 
 
 I've also taken the liberty of adding a new label to the Jacobson-Truax classification to indicate a sequence of events seen in the data that this code was originally developed for: participants who dropped below the JT-criterion at post, but did not actually show a pre-post change sufficiently large to be classified as reliable change (i.e. they scored already close to the JT-criterion value at basline). Such participants are labeled 'non-reliably recovered'. 

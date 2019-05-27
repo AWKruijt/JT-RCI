@@ -191,10 +191,6 @@ JTRCI <- function(data = NA,
     }
   } # end of if (indextype == "JT")
   
-#  if (indextype == "RCI") {
-#    crittype <- "non JT simple RCI"
-#    critval <- "none"
-#  }
   
   ## create a JTRCIdf dataframe and log things:
   
@@ -259,13 +255,6 @@ JTRCI <- function(data = NA,
     
     # pass dataframe to environment
     JTRCIdf <<- JTRCIdf
-    
-    ## output table if requested: 
-    if (table) {
-      JTtable <- data.table::setDT(JTRCIdf)[, .N, by = .("Jacobson Truax classification" = class_JTRCI)]
-      JTtable <- data.table::setorder(JTtable, na.last = T)
-      print(JTtable)
-    }
   }
   
   if (indextype == "RCI") {
@@ -291,25 +280,24 @@ JTRCI <- function(data = NA,
     # pass dataframe to environment
     JTRCIdf <<- JTRCIdf
     
-    ## output table if requested: 
-    if (table) { 
-      
-      if(useGroups) {
-        
-        RCItable <- htmlTable::htmlTable(table(JTRCIdf$class_RCI, JTRCIdf$group))
-        print(RCItable)
-      }
-      else {
-        RCItable <-  data.table::setDT(JTRCIdf)[, .N, by = .("reliable change classification" = class_RCI)]
-        RCItable <- data.table::setorder(RCItable, na.last = T)
-        print(RCItable)
-      }
-    }
+  }
+  
+  ## output table if requested: 
+  
+  if (table == T & indextype == "JT") {
+    if(useGroups) {
+    tableJT(useGroups = T) } else {
+      tableJT(useGroups = F) }
+    } 
+  
+  if (table == T & indextype == "RCI") {
+    if(useGroups){
+      tableRCI(useGroups = T) } else {
+        tableRCI(useGroups = F) }
   }
   
   
   ## plot JTRCI or RCI if requested:
-
   
   if (plot == T & indextype == "JT") {
     plotJT(...)
