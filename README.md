@@ -11,7 +11,7 @@ table 2 by Jacobson & Truax
 
 *notice that this is a ‘higher is better’ measure*
 
------
+## 
 
 to install JTRCI, first install package devtools from CRAN - either
 through the ‘install packages’ interface (in for instance Rstudio) or
@@ -29,15 +29,15 @@ devtools::install_github("AWKruijt/JT-RCI")
 library(JTRCI)
 ```
 
------
+# 
 
 JRTCI() is the main function in this package:
 
-JTRCI (data = NA, pre = NA, post = NA, ppid = NA, group = NA,  
-            reliability = NA, higherIsBetter = F, indextype = “JT”,
+   JTRCI (data = NA, pre = NA, post = NA, ppid = NA, group = NA,  
+               reliability = NA, higherIsBetter = F, indextype = “JT”,
 JTcrit = “auto”,  
-            normM = NA, normSD = NA, dysfM = NA, dysfSD = NA,  
-            plot = T, table = T, …)
+               normM = NA, normSD = NA, dysfM = NA, dysfSD = NA,  
+               plot = T, table = T, …)
 
 It requires data in wide format (one row per individual) and an estimate
 of the measure reliability to be given through parameter ‘reliability
@@ -57,6 +57,23 @@ various choices a researcher has to make when applying the
 Jacobson-Truax method. It is recommended to pay attention to the various
 output messages.
 
+# 
+
+When plot = T (default), the JTRCI() function will call on either the
+JTplot() or RCIplot().
+
+The JTplot()/RCIplot() functions take the following parameters:
+
+   plotJT(data = JTRCIdf, useGroups = F, facetplot = F, addJitter = F,  
+             xlab = “pre”, ylab = “post”, plottitle = “Jacobson-Truax
+plot”,  
+             addInfoLegend = c(“yes”, “classcounts”, “JTcrit”, “no”))
+
+These parameters can also be passed directly into a call on JTRCI() (see
+examples below)
+
+# 
+
 An online dashboard using essentially the same code is available at:
 <https://awkruijt.shinyapps.io/JTRCI_dashboard/> It allows the user to
 upload their own data (as a .csv file) or to test things using
@@ -67,14 +84,16 @@ An example of a more advanced plot (with multiple follow-ups) based on
 the JTRCI-outputs can be found here:
 <https://awkruijt.netlify.com/plotposts/longitudinaljtrci>
 
+# 
+
 #### examples:
 
 ``` r
 # generate some random data:
 df <- cbind.data.frame("ppid" = seq(1:64), 
                        "pre" = rnorm(64, 65, 8), 
-                       "post" = rnorm(64, 45, 8), 
-                       "group" = rep(c("treatment", "control"), 32))
+                       "post" = c(rnorm(32, 40, 8), rnorm(32, 45, 8)),
+                       "group" = rep(c("treatment", "control"), each = 32))
 ```
 
 Obtain and plot Jacobson-Truax indices using parameter JTcrit =
@@ -101,7 +120,7 @@ JTRCI(data = df,
     ## NB: using the sample baseline distribution to characterize the dysfunctional population. 
     ##     to change: provide norms for dysfunctional population using 'dysfM =' and 'dysfSD ='
 
-    ## Jacobson-Truax criterion A: 50.6
+    ## Jacobson-Truax criterion A: 50
 
     ##  this value represents two sd from the baseline total sample mean
 
@@ -109,10 +128,10 @@ JTRCI(data = df,
     ##  interpret their Jacobson-Truax classification with caution
 
     ##    Jacobson Truax classification  N
-    ## 1:                     unchanged  7
-    ## 2:                      improved 14
+    ## 1:                     unchanged  5
+    ## 2:                      improved  9
     ## 3:        non reliably recovered  3
-    ## 4:                     recovered 40
+    ## 4:                     recovered 47
 
 <img src="README_files/figure-gfm/unnamed-chunk-8-1.png" height="450px" />
 
@@ -134,7 +153,7 @@ plot\_RCI():
 ``` r
 # plot the reliable change indices obtained in the previous chunk - set x y and plot labels:
 
-plot_RCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change plot")
+plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change plot")
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-10-1.png" height="450px" />
@@ -144,11 +163,12 @@ directly in the JTRCI() function:
 
 ``` r
 # obtain and plot Jacobson-Truax indices using criterion B. 
+# add jittering of the points with addJitter = T
 
 JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
       reliability = .8, indextype = "JT", JTcrit = "B",
-      normM = 35, normSD = 5, 
-      useGroups = T, plottitle = "JT indices (crit B):")
+      normM = 30, normSD = 5, 
+      useGroups = T, addJitter = T, plottitle = "JT indices (crit B):")
 ```
 
     ## Assumed that lower scores are better (and reduction == improvement),
@@ -159,43 +179,70 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
 
     ## NB criterion C is recommended when the baseline distribution overlaps with the norm distribution
 
-    ## Jacobson-Truax criterion B: 45
+    ## Jacobson-Truax criterion B: 40
 
     ##  this value represents two sd from the functional/healthy population norm mean
 
     ##    Jacobson Truax classification  N
-    ## 1:                     unchanged  9
-    ## 2:                      improved 24
+    ## 1:                     unchanged  7
+    ## 2:                      improved 33
     ## 3:        non reliably recovered  1
-    ## 4:                     recovered 30
+    ## 4:                     recovered 23
 
 <img src="README_files/figure-gfm/unnamed-chunk-11-1.png" height="450px" />
 
 ``` r
 # obtain Jacobson-Truax indices using criterion C.
-# plot with parameter facetplot = T
+# plot with parameter facetplot = T - the plot function can handle up to 5 groups
 
 JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
       reliability = .8, indextype = "JT", JTcrit = "C",
-       normM = 35, normSD = 5, dysfM = 60, dysfSD = 5, 
-      facetplot = T, addJitter = F, plottitle = "JT indices by group:")
+       normM = 30, normSD = 5, dysfM = 60, dysfSD = 5, 
+      facetplot = T, plottitle = "JT indices by group:")
 ```
 
     ## Assumed that lower scores are better (and reduction == improvement),
     ##  if that is incorrect: set higherIsBetter = T
 
-    ## Jacobson-Truax criterion C:47.1
+    ## Jacobson-Truax criterion C:44
 
     ##  this value represents the weighted midpoint between the dysfunctional and functional norm mean, 
     ##  i.e. the value at which an individual is equally likely to belong to the functional as to the dysfunctional population
 
-    ## 1 participants scored below the Jacobson-Truax cut-off score at the pre-measurement 
-    ##  interpret their Jacobson-Truax classification with caution
-
     ##    Jacobson Truax classification  N
-    ## 1:                     unchanged  7
-    ## 2:                      improved 19
-    ## 3:        non reliably recovered  3
-    ## 4:                     recovered 35
+    ## 1:                     unchanged  6
+    ## 2:                      improved 20
+    ## 3:        non reliably recovered  2
+    ## 4:                     recovered 36
 
 <img src="README_files/figure-gfm/unnamed-chunk-12-1.png" height="450px" />
+
+It is important to note that when assessing/plotting Jacobson-Truax
+indices for multiple groups, the function combines the groups into one
+group for the calculations of the RCI (when using baseline
+characteristics as the ’dysfunctional distribution), or uses one single
+set of inputs dysfM and dysfSD as characteristic of the dysfunctional
+population. I.e. it assumes that the participants all originate from the
+same (sub)population and were randomly assigned to the different
+groups/conditions.
+
+Generally speaking (regardless of whether there are multiple
+conditions), Jacobson-Truax indices are designed for use with
+participants selected so that they would be expected to score high (or
+low in case of a higher-is-better measure) on the measure assessed. For
+a control group in which most/all participants score already within the
+‘functional’ (norm) range the traditional Jacobson-Truax
+classification labels make little sense: i.e. someone who scored in the
+healthy range at both the pre- and the post-assessment would be
+classified as ‘recovered’ without an actual recovering happening. The
+more ‘simple’ reliable change indices can be used for comparison of
+groups preselected to (likely) differ at baseline on the measure
+assessed.
+
+I’ve also taken the liberty of adding a new label to the Jacobson-Truax
+classification to indicate a sequence of events seen in the data that
+this code was originally developed for: participants who dropped below
+the JT-criterion at post, but did not actually show a pre-post change
+sufficiently large to be classified as reliable change (i.e. they scored
+already close to the JT-criterion value at basline). Such participants
+are labeled ‘non-reliably recovered’.

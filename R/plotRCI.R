@@ -1,11 +1,16 @@
-plot_RCI <- function(data = JTRCIdf, 
-                     classcountsinlegend = T, 
+plotRCI <- function(data = JTRCIdf, 
+                    addInfoLegend = c("yes", "no"), 
                      useGroups = F, 
                      facetplot = F, 
-                     addJitter = T, 
+                     addJitter = F, 
                      xlab = "pre", 
                      ylab = "post", 
                      plottitle = "reliable change plot") {
+  
+  # tiny trick to suppress 'the condition has length > 1 and only the first element will be used' warning when addInfoLegend is not explicitly given
+  if(length(addInfoLegend) > 1 ) {
+    addInfoLegend <- addInfoLegend[1]
+  }
   
   if(!exists("JTRCIdf")) {
     stop("\nto plot RCI indices, first run the JTRCI() function with argument 'indextype = \"RCI\"'", call. = F)}
@@ -23,7 +28,13 @@ plot_RCI <- function(data = JTRCIdf,
   JTRCIdf$classPlot <- JTRCIdf$class_RCI
   Sdiff <- JTRCIdf$Sdiff[1]
   
-  if(classcountsinlegend) {
+  # initiate a variable indicating if classcounts shoudl be added to the legend as F, it will be set to T if classcounts are set to be shown by the value of addInfoLegend
+  classcountsinlegend <- F
+  
+    if(addInfoLegend %in% c("yes", "classcounts") ) {
+    
+      classcountsinlegend <- T
+      
     if(useGroups){
       
       classtab <- table(JTRCIdf$classPlot, JTRCIdf$group)

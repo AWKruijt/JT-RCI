@@ -1,11 +1,16 @@
-plot_JT <- function(data = JTRCIdf, 
-                     classcountsinlegend = T, 
+plotJT <- function(data = JTRCIdf, 
+                   addInfoLegend = c("yes", "classcounts", "JTcrit", "no"),
                      useGroups = F, 
                      facetplot = F, 
-                     addJitter = T, 
+                     addJitter = F, 
                      xlab = "pre", 
                      ylab = "post", 
                      plottitle = "Jacobson-Truax plot") {
+  
+  # tiny trick to suppress 'the condition has length > 1 and only the first element will be used' warning when addInfoLegend is not explicitly given
+  if(length(addInfoLegend) > 1 ) {
+    addInfoLegend <- addInfoLegend[1]
+  }
   
   if(!exists("JTRCIdf")) {
     stop("\nto plot JT indices, first run the JTRCI() function with argument 'indextype = \"JT\"'", call. = F)}
@@ -22,8 +27,13 @@ plot_JT <- function(data = JTRCIdf,
   critval <- JTRCIdf$critval[1]
   Sdiff <- JTRCIdf$Sdiff[1]
   
+  # initiate a variable indicating if classcounts shoudl be added to the legend as F, it will be set to T if classcounts are set to be shown by the value of addInfoLegend
+  classcountsinlegend <- F
   
-  if(classcountsinlegend) {
+    if(addInfoLegend %in% c("yes", "classcounts")) {
+      
+    classcountsinlegend <- T
+    
     if(useGroups){
       
       classtab <- table(JTRCIdf$classPlot, JTRCIdf$group)
@@ -81,11 +91,16 @@ plot_JT <- function(data = JTRCIdf,
   else { jitter <- position_jitter(width = 0, height = 0)}
   
   # a dataframe to define the lines with - this way we can add a legend for the lines to the plot:  
-  linesdf <- data.frame(lineID = c("no change", "reliable change boundary", "reliable change boundary", paste0("JT ", JTRCIdf$crittype[1], ": ", round(critval,1))), 
+  
+  if(addInfoLegend %in% c("yes", "JTcrit")) {
+    labelJTcrit <- paste0("JT ", JTRCIdf$crittype[1], ": ", round(critval,1)) } else {
+      labelJTcrit <- "JT criterion" }
+    
+  linesdf <- data.frame(lineID = c("no change", "reliable change boundary", "reliable change boundary", labelJTcrit), 
                         intercept = c(0, 1.96 * Sdiff, -1.96 * Sdiff, critval),
                         slope = c(1, 1, 1, 0))
   
-  linesdf$lineID <- factor(linesdf$lineID, levels = c ("no change", "reliable change boundary", paste0("JT ", JTRCIdf$crittype[1], ": ", round(critval,1))))
+  linesdf$lineID <- factor(linesdf$lineID, levels = c ("no change", "reliable change boundary", labelJTcrit))
   
   
   JT_plot <- ggplot(JTRCIdf[!(is.na(JTRCIdf$post > 0)), ], 
@@ -124,6 +139,7 @@ plot_JT <- function(data = JTRCIdf,
   
  
   print(JT_plot)
+  
   
 }
 

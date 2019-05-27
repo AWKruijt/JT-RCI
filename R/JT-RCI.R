@@ -191,10 +191,10 @@ JTRCI <- function(data = NA,
     }
   } # end of if (indextype == "JT")
   
-  if (indextype == "RCI") {
-    crittype <- "non JT simple RCI"
-    critval <- "none"
-  }
+#  if (indextype == "RCI") {
+#    crittype <- "non JT simple RCI"
+#    critval <- "none"
+#  }
   
   ## create a JTRCIdf dataframe and log things:
   
@@ -210,11 +210,12 @@ JTRCI <- function(data = NA,
   # write values to JTRCIdf:
   JTRCIdf$SEmeasurement <- SEmeasurement
   JTRCIdf$Sdiff <- Sdiff
+  if (indextype == "JT") {
   JTRCIdf$crittype <- crittype
-  JTRCIdf$critval <- critval
+  JTRCIdf$critval <- critval }
   
   ## compute Reliable Change Indices:
-  JTRCIdf$change_Sdiff <- JTRCIdf$change_abs / Sdiff
+  JTRCIdf$RCI <- JTRCIdf$change_abs / Sdiff
   
   ## check and warn if there are participants who were already 'recovered' at pre - their classification will be odd: 
   if (indextype == "JT") {
@@ -228,21 +229,21 @@ JTRCI <- function(data = NA,
     if (!higherIsBetter) {
       # determine Jacobson-Truax classification (note that these next lines only 'work' if the entire series is run in the correct order):
       JTRCIdf$class_JTRCI <- NA
-      JTRCIdf$class_JTRCI [JTRCIdf$post <= critval & JTRCIdf$change_Sdiff <= -1.96] <- "recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post <= critval & JTRCIdf$change_Sdiff > -1.96]  <- "non reliably recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$change_Sdiff <= -1.96]  <- "improved"
-      JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$change_Sdiff > -1.96]   <- "unchanged"
-      JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff >= 1.96]                            <- "deteriorated"
+      JTRCIdf$class_JTRCI [JTRCIdf$post <= critval & JTRCIdf$RCI <= -1.96] <- "recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post <= critval & JTRCIdf$RCI > -1.96]  <- "non reliably recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$RCI <= -1.96]  <- "improved"
+      JTRCIdf$class_JTRCI [JTRCIdf$post > critval & JTRCIdf$RCI > -1.96]   <- "unchanged"
+      JTRCIdf$class_JTRCI [JTRCIdf$RCI >= 1.96]                            <- "deteriorated"
     }
     
     if (higherIsBetter) {
       # determine Jacobson-Truax classification (note that these next lines only 'work' if the entire series is run in the correct order):
       JTRCIdf$class_JTRCI <- NA
-      JTRCIdf$class_JTRCI [JTRCIdf$post >= critval & JTRCIdf$change_Sdiff >= 1.96] <- "recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post >= critval & JTRCIdf$change_Sdiff < 1.96]  <- "non reliably recovered"
-      JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$change_Sdiff >= 1.96]  <- "improved"
-      JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$change_Sdiff < 1.96]   <- "unchanged"
-      JTRCIdf$class_JTRCI [JTRCIdf$change_Sdiff <= -1.96]                          <- "deteriorated"
+      JTRCIdf$class_JTRCI [JTRCIdf$post >= critval & JTRCIdf$RCI >= 1.96] <- "recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post >= critval & JTRCIdf$RCI < 1.96]  <- "non reliably recovered"
+      JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$RCI >= 1.96]  <- "improved"
+      JTRCIdf$class_JTRCI [JTRCIdf$post < critval & JTRCIdf$RCI < 1.96]   <- "unchanged"
+      JTRCIdf$class_JTRCI [JTRCIdf$RCI <= -1.96]                          <- "deteriorated"
     }
     
     
@@ -272,14 +273,14 @@ JTRCI <- function(data = NA,
     
     if (higherIsBetter == F) {
       JTRCIdf$class_RCI <- "no reliable change"
-      JTRCIdf$class_RCI [JTRCIdf$change_Sdiff > 1.96]  <- "reliably deteriorated"
-      JTRCIdf$class_RCI [JTRCIdf$change_Sdiff < -1.96] <- "reliably improved"
+      JTRCIdf$class_RCI [JTRCIdf$RCI > 1.96]  <- "reliably deteriorated"
+      JTRCIdf$class_RCI [JTRCIdf$RCI < -1.96] <- "reliably improved"
     }
     
     if (higherIsBetter == T) {
       JTRCIdf$class_RCI <- "no reliable change"
-      JTRCIdf$class_RCI [JTRCIdf$change_Sdiff > 1.96]  <- "reliably improved"
-      JTRCIdf$class_RCI [JTRCIdf$change_Sdiff < -1.96] <- "reliably deteriorated"
+      JTRCIdf$class_RCI [JTRCIdf$RCI > 1.96]  <- "reliably improved"
+      JTRCIdf$class_RCI [JTRCIdf$RCI < -1.96] <- "reliably deteriorated"
     }
     
     JTRCIdf$class_RCI <- factor(JTRCIdf$class_RCI, levels = c("reliably deteriorated",
@@ -308,13 +309,14 @@ JTRCI <- function(data = NA,
   
   
   ## plot JTRCI or RCI if requested:
+
   
   if (plot == T & indextype == "JT") {
-    plot_JT(...)
+    plotJT(...)
   }
   
   if (plot == T & indextype == "RCI") {
-    plot_RCI(...)
+    plotRCI(...)
   } 
   
 }
