@@ -1,3 +1,19 @@
+#' display a plot of the obtained Jacobson-Truax indices
+#'
+#' This function plotsdata stored in the JTRCIdf dataframe that is outputted by the JTRCI() function. When JTRCI() is run with it's default value 'plot = T', it will call upon either plotRCI() or plotJT() to create a plot. 
+#' plotRCI() and plotJT() can also be called directly by the user to output plots after having obtained the JTRCIdf (by running JTRCI())
+#' @param data The data to use, default is JTRCIdf. 
+#' @param addInfoLegend choice of "yes" or "no": if yes a count of observations within each RCI class (or within each class and group) will be added to the plot legend
+#' @param useGroups logical. If 'useGroups = T', dots are shaped and counts are given according seperately for each level of the group variable originally provided in the call to JTRCI()
+#' @param facetplot logical. If 'facetplot = T', different groups are plotted in separate facets
+#' @param addJitter logical. If 'addJitter = T', a small amount of random jitter is added to the plot
+#' @param xlab label to use for the x-axis
+#' @param ylab label to use for the y-axis
+#' @param plottitle title to show at the top of the plot
+#' @return a plot showing Jacobson-Truax indices
+#' @examples
+#' plotJT(xlab = "score pre", ylab = "score post", plottitle = "my JT plot", useGroups = F)
+
 plotJT <- function(data = JTRCIdf, 
                    addInfoLegend = c("yes", "classcounts", "JTcrit", "no"),
                      useGroups = F, 

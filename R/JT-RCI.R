@@ -1,5 +1,37 @@
-# @import data.table
-# @import ggplot2
+#' compute and plot Jacobson-Truax or reliable change indices
+#'
+#' The JTRCI() function is the main function in the JTRCI package.
+#' It requires data in wide format (one row per individual) and an estimate of the measure reliability to be given through parameter 'reliability ='. 
+#'
+#' The reliability estimate can be based on norm data. Alternatively, the internal reliability of the measure observed in the current data can be used. In that case, the user will first need to obtain their estimate of choice (alpha, omega, x-random splits splithalf reliability) using the raw (item level) data. 
+#'
+#' Obtaining reliable change indices is pretty straightforward: run the function with parameter 'indextype = "RCI"'. The JTRCI function's default setting is to obtain Jacobson-Truax indices ('indextype = "JT"'). The function is designed to provide guidance through the various choices a researcher has to make when applying the Jacobson-Truax method. It is recommended to pay attention to the various output messages.  
+#'
+#' @param data name of the dataframe containing pre and post data
+#' @param pre  name of the variable containing data at pre/baseline
+#' @param post name of the variable containing data at post
+#' @param ppid optional: name of variable containing participant identifying info. If not provided, the function will number participants/rows from 1: number of rows
+#' @param group optional: name of variable containing grouping information (e.g. groups 1/2 or experimental/control)
+#' @param reliability the value of the reliability estimate 
+#' @param higherIsBetter logical: if 'higherIsBetter = TRUE' the function assumes that a higher score indicates a better/more healthy/functional state
+#' @param indextype choice of "JT" or "RCI". Indicates whether to obtain Jacobson-Truax clinicial significant change or reliable change indices respectively
+#' @param JTcrit choice of "auto", "A", "B", "C". Indicates which criterion to use when obtaining Jacobson-Truax indices. 
+#' When 'JTcrit = "auto"' the function will determine which criteria is likely the best fitting based on the available information (e.g. whether function/dysfunctional norm distributions are provided and whether these distributions overlap or not). When no norm-distributions are provided, 'JTcrit = "auto"' will result in the function using criterion A with the baseline distribution as a proxy for the dysfunctional distribution. 
+#' Also note that when JTcrit is set to "B" or "C" but their required norm-data inputs are missing, it will output criterion A. When B or C is chosen but the other is a better fit, the function will create a message to inform the user about this. 
+#' @param normM mean value of the functional/healthy norm distribution
+#' @param normSD SD value of the functional/healthy norm distribution
+#' @param dysfM mean value of the dysfunctional norm distribution
+#' @param dysfSD SD value of the dysfunctional norm distribution
+#' @param plot logical, if plot = T a plot will be generated
+#' @param table logical, if table = T a table will be generated
+#' @param ... further arguments to be passed by JTRCI() to the table or plot functions (i.e. you can enter all their parameters directly into JTRCI())
+#' @return JTRCIdf - a dataframe containing all values and results of the JT or RCI calculations
+#' @export
+#' @examples
+#' JTRCI(data = df, ppid = "ppid", pre = "pre", post = "post",  reliability = .8, indextype = "JT", JTcrit = "auto")
+
+#' @import data.table
+#' @import ggplot2
 
 ## this code relies heavily on the excellent article by Stephanie Bauer, Michael Lambert, & Steven Lars Nielsen:
 ## Clinical Significance Methods: A Comparison of Statistical Techniques
