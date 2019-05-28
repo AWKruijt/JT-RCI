@@ -4,7 +4,7 @@
 \alias{tableRCI}
 \title{display a table summarizing reliable change indices}
 \usage{
-tableRCI(data = JTRCIdf, useGroups = NA)
+tableRCI(data = JTRCIdf, useGroups = F)
 }
 \arguments{
 \item{data}{The data to use, default is JTRCIdf.}

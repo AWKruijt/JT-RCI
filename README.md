@@ -119,19 +119,19 @@ JTRCI(data = df,
     ## NB: using the sample baseline distribution to characterize the dysfunctional population. 
     ##     to change: provide norms for dysfunctional population using 'dysfM =' and 'dysfSD ='
 
-    ## Jacobson-Truax criterion A: 51.6
+    ## Jacobson-Truax criterion A: 47.5
 
     ##  this value represents two sd from the baseline  sample mean
 
-    ## 2 participants scored below the Jacobson-Truax cut-off score at the pre-measurement 
+    ## 1 participants scored below the Jacobson-Truax cut-off score at the pre-measurement 
     ##  interpret their Jacobson-Truax classification with caution
 
     ##    Jacobson-Truax classification  N
     ## 1:                  deteriorated  0
-    ## 2:                     unchanged  3
-    ## 3:                      improved  2
-    ## 4:        non reliably recovered  2
-    ## 5:                     recovered 57
+    ## 2:                     unchanged  4
+    ## 3:                      improved 10
+    ## 4:        non reliably recovered  5
+    ## 5:                     recovered 45
 
 <img src="README_files/figure-gfm/unnamed-chunk-8-1.png" height="450px" />
 
@@ -161,13 +161,13 @@ plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change
 and obtain RCI tables by calling tableRCI():
 
 ``` r
-tableRCI(useGroups = F)
+tableRCI()
 ```
 
     ##    reliable change classification  N
     ## 1:          reliably deteriorated  0
-    ## 2:             no reliable change  5
-    ## 3:              reliably improved 59
+    ## 2:             no reliable change  9
+    ## 3:              reliably improved 55
 
 ``` r
 tableRCI(useGroups = T)
@@ -175,8 +175,8 @@ tableRCI(useGroups = T)
 
     ##    reliable change classification control treatment
     ## 1:          reliably deteriorated       0         0
-    ## 2:             no reliable change       3         2
-    ## 3:              reliably improved      29        30
+    ## 2:             no reliable change       6         3
+    ## 3:              reliably improved      26        29
 
 Parameters for the plot\_JT()/plot\_RCI() functions can also be passed
 directly in the JTRCI() function:
@@ -208,10 +208,10 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
 
     ##    Jacobson-Truax classification control treatment
     ## 1:                  deteriorated       0         0
-    ## 2:                     unchanged       3         2
-    ## 3:                      improved      18        15
+    ## 2:                     unchanged       6         3
+    ## 3:                      improved      22        14
     ## 4:        non reliably recovered       0         0
-    ## 5:                     recovered      11        15
+    ## 5:                     recovered       4        15
 
 <img src="README_files/figure-gfm/unnamed-chunk-12-1.png" height="450px" />
 
@@ -232,17 +232,17 @@ JTRCI(data = df, pre = "pre", post = "post",  group = "group", ppid = "ppid",
     ## Assumed that lower scores are better (and reduction == improvement),
     ##  if that is incorrect: set higherIsBetter = T
 
-    ## Jacobson-Truax criterion C:44.9
+    ## Jacobson-Truax criterion C:42.8
 
     ##  this value represents the weighted midpoint between the dysfunctional and functional norm mean, 
     ##  i.e. the value at which an individual is equally likely to belong to the functional as to the dysfunctional population
 
     ##    Jacobson-Truax classification control treatment
     ## 1:                  deteriorated       0         0
-    ## 2:                     unchanged       3         1
-    ## 3:                      improved      12         7
-    ## 4:        non reliably recovered       0         1
-    ## 5:                     recovered      17        23
+    ## 2:                     unchanged       4         3
+    ## 3:                      improved      15        11
+    ## 4:        non reliably recovered       2         0
+    ## 5:                     recovered      11        18
 
 <img src="README_files/figure-gfm/unnamed-chunk-13-1.png" height="450px" />
 

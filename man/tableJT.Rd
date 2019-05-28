@@ -4,7 +4,7 @@
 \alias{tableJT}
 \title{display a table summarizing Jacobson-Truax indices}
 \usage{
-tableJT(data = JTRCIdf, useGroups = NA)
+tableJT(data = JTRCIdf, useGroups = F)
 }
 \arguments{
 \item{data}{The data to use, default is JTRCIdf.}

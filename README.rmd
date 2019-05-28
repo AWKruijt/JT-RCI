@@ -11,10 +11,11 @@ knitr::opts_chunk$set(dpi=300, out.height ="450px", fig.asp = .71, fig.pos = "h"
 ```
 
 ```{r warning=FALSE, include=FALSE}
+require(JTRCI)
+
 require(ggplot2)
 require(data.table)
 
-require(JTRCI)
 #source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/JT-RCI.R')
 #source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/plotJT.R')
 #source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/plotRCI.R')
@@ -134,7 +135,7 @@ plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change
 
 and obtain RCI tables by calling tableRCI():
 ```{r}
-tableRCI(useGroups = F)
+tableRCI()
 
 tableRCI(useGroups = T)
 ```
