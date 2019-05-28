@@ -3,7 +3,7 @@
 #' This function plotsdata stored in the JTRCIdf dataframe that is outputted by the JTRCI() function. When JTRCI() is run with it's default value 'plot = T', it will call upon either plotRCI() or plotJT() to create a plot. 
 #' plotRCI() and plotJT() can also be called directly by the user to output plots after having obtained the JTRCIdf (by running JTRCI())
 #' @param data The data to use, default is JTRCIdf. 
-#' @param addInfoLegend choice of "yes" or "no": if yes a count of observations within each RCI class (or within each class and group) will be added to the plot legend
+#' @param addInfoLegend choice of "yes", "classcounts", "JTcrit" or "no": if yes both a count of observations within each JT class (or within each class and group) and the type and value of the JT criterion will be added to the plot legends. If 'classcounts', only the counts will be added, if 'JTcrit' only the criterion-information will be added, and if 'no', no additional information will be displayed in the legends. 
 #' @param useGroups logical. If 'useGroups = T', dots are shaped and counts are given according seperately for each level of the group variable originally provided in the call to JTRCI()
 #' @param facetplot logical. If 'facetplot = T', different groups are plotted in separate facets
 #' @param addJitter logical. If 'addJitter = T', a small amount of random jitter is added to the plot

@@ -11,7 +11,7 @@ plotJT(data = JTRCIdf, addInfoLegend = c("yes", "classcounts",
 \arguments{
 \item{data}{The data to use, default is JTRCIdf.}
 
-\item{addInfoLegend}{choice of "yes" or "no": if yes a count of observations within each RCI class (or within each class and group) will be added to the plot legend}
+\item{addInfoLegend}{choice of "yes", "classcounts", "JTcrit" or "no": if yes both a count of observations within each JT class (or within each class and group) and the type and value of the JT criterion will be added to the plot legends. If 'classcounts', only the counts will be added, if 'JTcrit' only the criterion-information will be added, and if 'no', no additional information will be displayed in the legends.}
 
 \item{useGroups}{logical. If 'useGroups = T', dots are shaped and counts are given according seperately for each level of the group variable originally provided in the call to JTRCI()}
 
