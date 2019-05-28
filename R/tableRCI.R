@@ -6,6 +6,10 @@
 #' @return a table summarizing counts per classification label.
 #' @examples
 #' tableRCI(useGroups = F)
+#' #' @import data.table
+#' @import ggplot2
+#' @export
+
 
 tableRCI <- function(data = JTRCIdf, useGroups = NA) {
   

@@ -11,3 +11,7 @@ Imports: data.table, ggplot2
 URL: http://awkruijt/JTRCI/
 BugReports: https://github.com/awkruijt/JTRCI/issues
 RoxygenNote: 6.1.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

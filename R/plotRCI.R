@@ -13,7 +13,10 @@
 #' @return a plot showing reliable change indices
 #' @examples
 #' plotRCI(xlab = "score pre", ylab = "score post", plottitle = "my reliable change plot", useGroups = F)
-
+#' @import data.table
+#' @import ggplot2
+#' @export
+#' 
 plotRCI <- function(data = JTRCIdf, 
                     addInfoLegend = c("yes", "no"), 
                      useGroups = F, 

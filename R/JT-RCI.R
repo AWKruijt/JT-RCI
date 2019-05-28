@@ -26,12 +26,12 @@
 #' @param table logical, if table = T a table will be generated
 #' @param ... further arguments to be passed by JTRCI() to the table or plot functions (i.e. you can enter all their parameters directly into JTRCI())
 #' @return JTRCIdf - a dataframe containing all values and results of the JT or RCI calculations
-#' @export
 #' @examples
 #' JTRCI(data = df, ppid = "ppid", pre = "pre", post = "post",  reliability = .8, indextype = "JT", JTcrit = "auto")
 
 #' @import data.table
 #' @import ggplot2
+#' @export
 
 ## this code relies heavily on the excellent article by Stephanie Bauer, Michael Lambert, & Steven Lars Nielsen:
 ## Clinical Significance Methods: A Comparison of Statistical Techniques

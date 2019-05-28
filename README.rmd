@@ -14,11 +14,12 @@ knitr::opts_chunk$set(dpi=300, out.height ="450px", fig.asp = .71, fig.pos = "h"
 require(ggplot2)
 require(data.table)
 
-source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/JT-RCI.R')
-source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/plotJT.R')
-source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/plotRCI.R')
-source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/tableJT.R')
-source('~/OneDrive - psychology.su.se/AW r functions and stuff/JT-RCI/R/tableRCI.R')
+require(JTRCI)
+#source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/JT-RCI.R')
+#source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/plotJT.R')
+#source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/plotRCI.R')
+#source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/tableJT.R')
+#source('~/OneDrive - psychology.su.se/AW r functions and #stuff/JT-RCI/R/tableRCI.R')
 ```
 
 ```{r include=FALSE}

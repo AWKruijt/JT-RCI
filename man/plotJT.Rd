@@ -9,24 +9,24 @@ plotJT(data = JTRCIdf, addInfoLegend = c("yes", "classcounts",
   xlab = "pre", ylab = "post", plottitle = "Jacobson-Truax plot")
 }
 \arguments{
-\item{data}{The data to use, default is JTRCIdf.}
+\item{data}{dataframe to use, default is JTRCIdf.}
 
-\item{addInfoLegend}{choice of "yes", "classcounts", "JTcrit" or "no": if yes both a count of observations within each JT class (or within each class and group) and the type and value of the JT criterion will be added to the plot legends. If 'classcounts', only the counts will be added, if 'JTcrit' only the criterion-information will be added, and if 'no', no additional information will be displayed in the legends.}
+\item{addInfoLegend}{choice of "yes", "classcounts", "JTcrit" or "no": if "yes" (default) both a count of observations within each JT class (or within each class and group) and the type and value of the JT criterion will be added to the plot legends. If "classcounts", only the counts will be added, if "JTcrit" only the criterion-information will be added, and if "no", no additional information will be displayed in the legends.}
 
-\item{useGroups}{logical. If 'useGroups = T', dots are shaped and counts are given according seperately for each level of the group variable originally provided in the call to JTRCI()}
+\item{useGroups}{logical. If 'useGroups = T', dots are given different shapes, and counts are given seperately, for each level of the group variable originally provided in the call to JTRCI()}
 
 \item{facetplot}{logical. If 'facetplot = T', different groups are plotted in separate facets}
 
-\item{addJitter}{logical. If 'addJitter = T', a small amount of random jitter is added to the plot}
+\item{addJitter}{logical. If 'addJitter = T', a small amount of random jitter is added to each data point in the plot.}
 
-\item{xlab}{label to use for the x-axis}
+\item{xlab}{label to use for the x-axis.}
 
-\item{ylab}{label to use for the y-axis}
+\item{ylab}{label to use for the y-axis.}
 
-\item{plottitle}{title to show at the top of the plot}
+\item{plottitle}{title to show at the top of the plot.}
 }
 \value{
-a plot showing Jacobson-Truax indices
+a plot showing Jacobson-Truax indices.
 }
 \description{
 This function plotsdata stored in the JTRCIdf dataframe that is outputted by the JTRCI() function. When JTRCI() is run with it's default value 'plot = T', it will call upon either plotRCI() or plotJT() to create a plot. 

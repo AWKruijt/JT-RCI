@@ -6,7 +6,10 @@
 #' @return a table summarizing counts per classification label.
 #' @examples
 #' tableJT(useGroups = F)
-
+#' @import data.table
+#' @import ggplot2
+#' @export
+#' 
 tableJT <- function(data = JTRCIdf, useGroups = NA) {
   
   require(data.table)

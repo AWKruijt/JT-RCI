@@ -19,4 +19,5 @@ This function creates a table summarzing the number of observations for each lab
 }
 \examples{
 tableRCI(useGroups = F)
+#' @import data.table
 }
