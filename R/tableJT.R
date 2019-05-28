@@ -35,6 +35,6 @@ tableJT <- function(data = JTRCIdf, useGroups = NA) {
     
   JTtable <-as.data.table(JTRCIdf[, table("Jacobson-Truax classification" = class_JTRCI)])
 }
-  print(JTtable)
+  knitr::kable(JTtable)
 }
   

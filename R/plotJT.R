@@ -159,7 +159,7 @@ plotJT <- function(data = JTRCIdf,
     )
   
  
-  knitr::kable(JT_plot)
+  print(JT_plot)
   
   
 }
