@@ -10,7 +10,7 @@
 #' @import ggplot2
 #' @export
 #' 
-tableJT <- function(data = JTRCIdf, useGroups = NA) {
+tableJT <- function(data = JTRCIdf, useGroups = F) {
   
   require(data.table)
   
@@ -35,6 +35,6 @@ tableJT <- function(data = JTRCIdf, useGroups = NA) {
     
   JTtable <-as.data.table(JTRCIdf[, table("Jacobson-Truax classification" = class_JTRCI)])
 }
-  knitr::kable(JTtable)
+  print(JTtable)
 }
   

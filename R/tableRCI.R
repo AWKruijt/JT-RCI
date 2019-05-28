@@ -11,7 +11,7 @@
 #' @export
 
 
-tableRCI <- function(data = JTRCIdf, useGroups = NA) {
+tableRCI <- function(data = JTRCIdf, useGroups = F) {
   
   require(data.table)
   
