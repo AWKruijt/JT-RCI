@@ -70,10 +70,10 @@ JTRCI <- function(data = NA,
   
   if (any(rowSums(is.na(data[, c(pre, post)])) != 0)) {
     message(paste0("NB ", sum(rowSums(is.na(data[, c(pre, post)])))," cases have missing data - these are ommitted from the calculations\n"))
-    
-    df <- data[rowSums(is.na(data[, c(pre, post)])) == 0,]
-  }
+      }
   
+    df <- data[rowSums(is.na(data[, c(pre, post)])) == 0,]
+
   x.pre <- as.numeric(df [, pre])
   x.post <- as.numeric(df [, post])
   
